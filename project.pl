@@ -53,40 +53,40 @@ no_wall_num(point(R,C),_):- not(wall_num(point(R,C),_)).
 inside_bounds(R,C):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
 
 %to check if the right neighbour of a point is not a wall
-right_empty(R,C):-size(_,Cmax), inside_bounds(R,C),
+right_empty(point(R,C)):- size(_,Cmax), inside_bounds(R,C),
                     C1 is C + 1 , C1 =< Cmax ,
                     no_wall(point(R,C1)) , no_wall_num(point(R,C1),_).
 
 %to check if the left neighbour of a point is not a wall
-left_empty(R,C):- inside_bounds(R,C),
+left_empty(point(R,C)):- inside_bounds(R,C),
                     C1 is C - 1 , C1 > 0, 
                     no_wall(point(R,C1)) , no_wall_num(point(R,C1),_).
 
 %to check if the top neighbour of a point is not a wall
-top_empty(R,C):- inside_bounds(R,C), 
+top_empty(point(R,C)):- inside_bounds(R,C), 
                     R1 is R - 1 ,R1 > 0, 
                     no_wall(point(R1,C)) , no_wall_num(point(R1,C),_).
 
 %to check if the bottom neighbour of a point is not a wall
-down_empty(R,C):- size(Rmax,_),inside_bounds(R,C), 
+down_empty(point(R,C)):- size(Rmax,_),inside_bounds(R,C), 
                     R1 is R + 1 ,R1 =< Rmax, 
                     no_wall(point(R1,C)) , no_wall_num(point(R1,C),_).
 
 
 %to check if four sides empty and num is four then it is ready to be lit
-sides_empty(R,c):- right_empty(R,C),left_empty(R,C),top_empty(R,C),down_empty(R,C).
+sides_empty(R,C):- right_empty(point(R,C)),left_empty(point(R,C)),top_empty(point(R,C)),down_empty(point(R,C)).
 
-return_list_right(R,C,[R,C|_]):- not(right_empty(R,C)) ,!.
-return_list_right(R,C,[R,C|T]):- right_empty(R,C), C1 is C+1 , return_list_right(R,C1,T) .
+return_list_right(point(R,C),[point(R,C)|_]):- not(right_empty(point(R,C))) ,!.
+return_list_right(point(R,C),[point(R,C)|T]):- right_empty(point(R,C)), C1 is C+1 , return_list_right(point(R,C1),T) .
 
-return_list_left(R,C,[R,C|_]):- not(left_empty(R,C)) ,!.
-return_list_left(R,C,[R,C|T]):- left_empty(R,C), C1 is C-1 , return_list_left(R,C1,T).
+return_list_left(point(R,C),[point(R,C)|_]):- not(left_empty(point(R,C))) ,!.
+return_list_left(point(R,C),[point(R,C)|T]):- left_empty(point(R,C)), C1 is C-1 , return_list_left(point(R,C1),T).
 
-return_list_up(R,C,[R,C|_]):- not(top_empty(R,C)) ,!.
-return_list_up(R,C,[R,C|T]):- top_empty(R,C), R1 is R-1 , return_list_up(R1,C,T).
+return_list_up(point(R,C),[point(R,C)|_]):- not(top_empty(point(R,C))) ,!.
+return_list_up(point(R,C),[point(R,C)|T]):- top_empty(point(R,C)), R1 is R-1 , return_list_up(point(R1,C),T).
 
-return_list_down(R,C,[R,C|_]):- not(down_empty(R,C)) ,!.
-return_list_down(R,C,[R,C|T]):- down_empty(R,C), R1 is R+1 , return_list_down(R1,C,T).
+return_list_down(point(R,C),[point(R,C)|_]):- not(down_empty(point(R,C))) ,!.
+return_list_down(point(R,C),[point(R,C)|T]):- down_empty(point(R,C)), R1 is R+1 , return_list_down(point(R1,C),T).
 
-%this function returns the same row without checking if it is lighted by another light
-%same_row(point(R,C),[point(R,C) |T]):- 
+%this function returns the same row without checking if it is lighted by another light.
+return_list_row(point(R,C),[RIGHT,LEFT]):- return_list_left(point(R,C),LEFT),return_list_right(point(R,C),RIGHT).

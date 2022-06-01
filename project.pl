@@ -43,7 +43,7 @@ light(point(8,6)).
 
 %rules
 no_wall(point(R,C)):- not(wall(point(R,C))).
-no_wall_num(point(R,C),_):- not(wall_num(point(R,C))).
+no_wall_num(point(R,C),_):- not(wall_num(point(R,C),_)).
 inside_bounds(R,C):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
 
 right_empty(R,C):-size(_,Cmax), inside_bounds(R,C),
@@ -64,9 +64,8 @@ down_empty(R,C):- size(Rmax,_),inside_bounds(R,C),
 sides_empty(R,c):- right_empty(R,C),left_empty(R,C),top_empty(R,C),down_empty(R,C).
 
 
-add_to_row_right(R,C,[R,C|T]):- right_empty(R,C) , C1 is C+1 , add_to_row_right(R,C1,T).
-add_to_row_right(R,C,_):- not(right_empty(R,C)).
-
+return_list_right(R,C,[R,C|T]):- right_empty(R,C), C1 is C+1 , return_list_right(R,C1,T) .
+return_list_right(R,C,[R,C|T]):- not(right_empty(R,C)).
 
 
 %this function returns the same row without checking if it is lighted by another light

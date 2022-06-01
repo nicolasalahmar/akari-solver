@@ -79,7 +79,14 @@ sides_empty(R,c):- right_empty(R,C),left_empty(R,C),top_empty(R,C),down_empty(R,
 return_list_right(R,C,[R,C|_]):- not(right_empty(R,C)) ,!.
 return_list_right(R,C,[R,C|T]):- right_empty(R,C), C1 is C+1 , return_list_right(R,C1,T) .
 
+return_list_left(R,C,[R,C|_]):- not(left_empty(R,C)) ,!.
+return_list_left(R,C,[R,C|T]):- left_empty(R,C), C1 is C-1 , return_list_left(R,C1,T).
 
+return_list_up(R,C,[R,C|_]):- not(top_empty(R,C)) ,!.
+return_list_up(R,C,[R,C|T]):- top_empty(R,C), R1 is R-1 , return_list_up(R1,C,T).
+
+return_list_down(R,C,[R,C|_]):- not(down_empty(R,C)) ,!.
+return_list_down(R,C,[R,C|T]):- down_empty(R,C), R1 is R+1 , return_list_down(R1,C,T).
 
 %this function returns the same row without checking if it is lighted by another light
 %same_row(point(R,C),[point(R,C) |T]):- 

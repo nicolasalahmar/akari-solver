@@ -45,15 +45,11 @@ light(point(8,6)).
 
 %to check if a point is not a wall
 no_wall(point(R,C)):- not(wall(point(R,C))).
-<<<<<<< HEAD
-no_wall_num(point(R,C),_):- not(wall_num(point(R,C),_)).
-=======
 
 %to check if a point is not a wall_num
-no_wall_num(point(R,C),_):- not(wall_num(point(R,C))).
+no_wall_num(point(R,C),_):- not(wall_num(point(R,C),_)).
 
 %to check if a point is inside the boudaries of the board
->>>>>>> 0efb54fedc9bbb4609543a1fb068d976de58f17b
 inside_bounds(R,C):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
 
 %to check if the right neighbour of a point is not a wall
@@ -80,9 +76,9 @@ down_empty(R,C):- size(Rmax,_),inside_bounds(R,C),
 %to check if four sides empty and num is four then it is ready to be lit
 sides_empty(R,c):- right_empty(R,C),left_empty(R,C),top_empty(R,C),down_empty(R,C).
 
-
+return_list_right(R,C,[R,C|_]):- not(right_empty(R,C)) ,!.
 return_list_right(R,C,[R,C|T]):- right_empty(R,C), C1 is C+1 , return_list_right(R,C1,T) .
-return_list_right(R,C,[R,C|T]):- not(right_empty(R,C)).
+
 
 
 %this function returns the same row without checking if it is lighted by another light

@@ -113,12 +113,17 @@ return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
 
 % we check if the cell's neighbor is not a wall or an edge and then we add it to the list.
-right_neighbor(point(R,C),point(R,B)):- right_empty(point(R,C)), B is C+1,!.
 right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))).
+right_neighbor(point(R,C),point(R,B)):- right_empty(point(R,C)), B is C+1,!.
 
-left_neighbor(point(R,C),point(A,B)):- left_empty(point(R,C)), A is R, B is C-1.
-up_neighbor(point(R,C),point(A,B)):- up_empty(point(R,C)), A is R-1, B is C.
-down_neighbor(point(R,C),point(A,B)):- down_empty(point(R,C)), A is R+1, B is C.
+left_neighbor(point(R,C),[]):- not(left_empty(point(R,C))).
+left_neighbor(point(R,C),point(A,B)):- left_empty(point(R,C)), A is R, B is C-1,!.
+
+up_neighbor(point(R,C),[]):- not(up_empty(point(R,C))).
+up_neighbor(point(R,C),point(A,B)):- up_empty(point(R,C)), A is R-1, B is C,!.
+
+down_neighbor(point(R,C),[]):- not(down_empty(point(R,C))).
+down_neighbor(point(R,C),point(A,B)):- down_empty(point(R,C)), A is R+1, B is C,!.
 
 %to return a list of a cell's neighbours
 neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),

@@ -183,3 +183,31 @@ no_double_light_row(point(R,C)):- return_list_row(point(R,C),List),flatten(List,
 no_double_light_col(point(R,C)):- return_list_col(point(R,C),List),flatten(List,List2),light_cells_count(List2, LightCells),LightCells=<1.
 %double light check
 no_double_light(point(R,C)):-no_double_light_row(point(R,C)),no_double_light_col(point(R,C)).
+
+
+
+%nicolas's code--------------------------------------------------------------------------------------------------------------------------------
+return_full_row(R,[point(R,1)|T]):- return_full_row(R,2,T) .
+return_full_row(R,C,[point(R,C)|T]):- C1 is C+1 ,inside_bounds(point(R,C1)), return_full_row(R,C1,T),!.
+return_full_row(R,C,[point(R,C)]):- !.
+
+return_full_col(C,[point(1,C)|T]):- return_full_col(2,C,T) .
+return_full_col(R,C,[point(R,C)|T]):- R1 is R + 1 ,inside_bounds(point(R1,C)), return_full_col(R1,C,T),!.
+return_full_col(R,C,[point(R,C)]):- !.
+
+inter([], _, []).
+inter([H1|T1], L2, [H1|Res]) :-member(H1, L2),inter(T1, L2, Res),!.
+inter([_|T1], L2, Res) :-inter(T1, L2, Res).
+
+return_cell(point(R,C),Result):- return_full_col(C,L1),return_full_row(R,L2),inter(L1,L2,Result).
+
+return_all_points(Result):- return_full_col(1,TheCol),return_all_points(Result,TheCol,[]).
+return_all_points(Result,[point(Khara,_)|T],[]):- return_full_row(Khara,TheRow), return_all_points(Result,T,TheRow),!.
+return_all_points(Result,[point(Khara,_)|T],Acc):- return_full_row(Khara,TheRow) , append(Acc,TheRow,NewAcc),return_all_points(Result,T,NewAcc),!.
+return_all_points(NewAcc,[point(Khara,_)],Acc):- return_full_row(Khara,TheRow) , append(Acc,TheRow,NewAcc).
+
+cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
+
+all_cells_lit:- return_all_points(Result),all_cells_lit(Result).
+all_cells_lit([H|T]):- lit(H),all_cells_lit(T).
+all_cells_lit([H]):- lit(H).

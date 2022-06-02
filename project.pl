@@ -115,6 +115,8 @@ return_list_wall_num(Result):- findall(point(R,C),wall_num(point(R,C),_),Result)
 return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
 
+
+% george's code---------------------------------------------------------------------------------------------------------------------
 % we check if the cell's neighbor is not a wall or an edge and then we add it to the list.
 right_neighbor(point(R,C),point(R,B)):- right_empty(point(R,C)), B is C+1,!.
 right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))).
@@ -167,9 +169,9 @@ wall_num_check_lights(point(R,C),Num):- wall_num(point(R,C),Num), light_neighbor
 
 
 %fix not light==> when there is no light it returns false,we need to t=return empty, otherwise it is working(it detects lights and walls and edges)
+%all functions are working except for not light (eza btm7i shi naykak)
 
-
-
+%rita's code--------------------------------------------------------------------------------------------------------------------------------
 %double light in row check
 no_double_light_row(point(R,C)):- return_list_row(point(R,C),List),flatten(List,List2),light_cells_count(List2, LightCells),LightCells=<1.
 %double light in column check

@@ -63,7 +63,7 @@ left_empty(point(R,C)):- inside_bounds(point(R,C)),
                     no_wall(point(R,C1)) , no_wall_num(point(R,C1),_).
 
 %to check if the top neighbour of a point is not a wall
-top_empty(point(R,C)):- inside_bounds(point(R,C)), 
+up_empty(point(R,C)):- inside_bounds(point(R,C)), 
                     R1 is R - 1 ,R1 > 0, 
                     no_wall(point(R1,C)) , no_wall_num(point(R1,C),_).
 
@@ -74,7 +74,7 @@ down_empty(point(R,C)):- size(Rmax,_),inside_bounds(point(R,C)),
 
 
 %to check if four sides empty and num is four then it is ready to be lit
-sides_empty(R,C):- right_empty(point(R,C)),left_empty(point(R,C)),top_empty(point(R,C)),down_empty(point(R,C)).
+sides_empty(R,C):- right_empty(point(R,C)),left_empty(point(R,C)),up_empty(point(R,C)),down_empty(point(R,C)).
 
 %return list with all elements to the right of the cell until it hits a wall or the edge
 return_list_right(point(R,C),[point(R,C)]):- not(right_empty(point(R,C))) ,!.
@@ -85,8 +85,8 @@ return_list_left(point(R,C),[point(R,C)]):- not(left_empty(point(R,C))) ,!.
 return_list_left(point(R,C),[point(R,C)|T]):- left_empty(point(R,C)), C1 is C-1 , return_list_left(point(R,C1),T).
 
 %return list with all elements up of the cell until it hits a wall or the edge
-return_list_up(point(R,C),[point(R,C)]):- not(top_empty(point(R,C))) ,!.
-return_list_up(point(R,C),[point(R,C)|T]):- top_empty(point(R,C)), R1 is R-1 , return_list_up(point(R1,C),T).
+return_list_up(point(R,C),[point(R,C)]):- not(up_empty(point(R,C))) ,!.
+return_list_up(point(R,C),[point(R,C)|T]):- up_empty(point(R,C)), R1 is R-1 , return_list_up(point(R1,C),T).
 
 %return list with all elements down of the cell until it hits a wall or the edge
 return_list_down(point(R,C),[point(R,C)]):- not(down_empty(point(R,C))) ,!.
@@ -113,17 +113,17 @@ return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
 
 % we check if the cell's neighbor is not a wall or an edge and then we add it to the list.
-right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))).
 right_neighbor(point(R,C),point(R,B)):- right_empty(point(R,C)), B is C+1,!.
+right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))).
 
+left_neighbor(point(R,C),point(R,B)):- left_empty(point(R,C)), B is C-1,!.
 left_neighbor(point(R,C),[]):- not(left_empty(point(R,C))).
-left_neighbor(point(R,C),point(A,B)):- left_empty(point(R,C)), A is R, B is C-1,!.
 
+up_neighbor(point(R,C),point(A,C)):- up_empty(point(R,C)), A is R-1,!.
 up_neighbor(point(R,C),[]):- not(up_empty(point(R,C))).
-up_neighbor(point(R,C),point(A,B)):- up_empty(point(R,C)), A is R-1, B is C,!.
 
+down_neighbor(point(R,C),point(A,C)):- down_empty(point(R,C)), A is R+1,!.
 down_neighbor(point(R,C),[]):- not(down_empty(point(R,C))).
-down_neighbor(point(R,C),point(A,B)):- down_empty(point(R,C)), A is R+1, B is C,!.
 
 %to return a list of a cell's neighbours
 neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),

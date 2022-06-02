@@ -42,7 +42,7 @@ light(point(8,6)).
 
 
 %rules
- 
+
 %to check if a point is inside the boudaries of the board
 inside_bounds(point(R,C)):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
 
@@ -113,21 +113,52 @@ return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
 
 % we check if the cell's neighbor is not a wall or an edge and then we add it to the list.
-%if the neighbor is a wall..it returnspoint(-1,-1).
 right_neighbor(point(R,C),point(R,B)):- right_empty(point(R,C)), B is C+1,!.
-right_neighbor(point(R,C),point(-1,-1)):- not(right_empty(point(R,C))).
+right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))).
 
 left_neighbor(point(R,C),point(R,B)):- left_empty(point(R,C)), B is C-1,!.
-left_neighbor(point(R,C),point(-1,-1)):- not(left_empty(point(R,C))).
+left_neighbor(point(R,C),[]):- not(left_empty(point(R,C))).
 
 up_neighbor(point(R,C),point(A,C)):- up_empty(point(R,C)), A is R-1,!.
-up_neighbor(point(R,C),point(-1,-1)):- not(up_empty(point(R,C))).
+up_neighbor(point(R,C),[]):- not(up_empty(point(R,C))).
 
 down_neighbor(point(R,C),point(A,C)):- down_empty(point(R,C)), A is R+1,!.
-down_neighbor(point(R,C),point(-1,-1)):- not(down_empty(point(R,C))).
+down_neighbor(point(R,C),[]):- not(down_empty(point(R,C))).
 
 %to return a list of a cell's neighbors
 neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),
                                              left_neighbor(point(R,C),LEFT),
                                              up_neighbor(point(R,C),UP),
                                              down_neighbor(point(R,C),DOWN).
+
+
+% we check if the cell's neighbor is not a wall or an edge [[[[and it is a light]]]]then we add it to the list.
+right_light_neighbor(point(R,C),point(R,B)):- light(point(R,B)), right_empty(point(R,C)), B is C+1,!.
+right_light_neighbor(point(R,C),[]):- not(right_empty(point(R,C))); (not(light(point(R,B))),B is C+1).
+
+left_light_neighbor(point(R,C),point(R,B)):- light(point(R,B)), left_empty(point(R,C)), B is C-1,!.
+left_light_neighbor(point(R,C),[]):- not(left_empty(point(R,C))); (not(light(point(R,B))),B is C-1).
+
+up_light_neighbor(point(R,C),point(A,C)):- light(point(A,C)), up_empty(point(R,C)), A is R-1,!.
+up_light_neighbor(point(R,C),[]):- not(up_empty(point(R,C))); (not(light(point(A,C))),A is R-1).
+
+down_light_neighbor(point(R,C),point(A,C)):- light(point(A,C)), down_empty(point(R,C)), A is R+1,!.
+down_light_neighbor(point(R,C),[]):- not(down_empty(point(R,C))); (not(light(point(A,C))),A is R+1).
+
+%to return a list of a cell's neighbors that are lights
+light_neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_light_neighbor(point(R,C),RIGHT),
+                                             left_light_neighbor(point(R,C),LEFT),
+                                             up_light_neighbor(point(R,C),UP),
+                                             down_light_neighbor(point(R,C),DOWN).
+
+
+
+%check if wall_num cell has lights equal to its number
+%helper function to count the number of elements in a list and ignore empty lists
+count([],0).
+count([H|T], N) :- count(T, N1), ((H\=[])-> N is N1 + 1 ; N = N1).
+%the actual function
+wall_num_check_lights(point(R,C),Num):- wall_num(point(R,C),Num), light_neighbors(point(R,C),X),count(X,Num).
+
+
+%fix not light==> when there is no light it returns false,we need to t=return empty, otherwise it is working(it detects lights and walls and edges)

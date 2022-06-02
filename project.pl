@@ -42,33 +42,33 @@ light(point(8,6)).
 
 
 %rules
+ 
+%to check if a point is inside the boudaries of the board
+inside_bounds(point(R,C)):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
 
 %to check if a point is not a wall
-no_wall(point(R,C)):- not(wall(point(R,C))).
+no_wall(point(R,C)):- not(wall(point(R,C))), inside_bounds(point(R,C)).
 
 %to check if a point is not a wall_num
-no_wall_num(point(R,C),_):- not(wall_num(point(R,C),_)).
-
-%to check if a point is inside the boudaries of the board
-inside_bounds(R,C):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
+no_wall_num(point(R,C),_):- not(wall_num(point(R,C),_)), inside_bounds(point(R,C)).
 
 %to check if the right neighbour of a point is not a wall
-right_empty(point(R,C)):- size(_,Cmax), inside_bounds(R,C),
+right_empty(point(R,C)):- size(_,Cmax), inside_bounds(point(R,C)),
                     C1 is C + 1 , C1 =< Cmax ,
                     no_wall(point(R,C1)) , no_wall_num(point(R,C1),_).
 
 %to check if the left neighbour of a point is not a wall
-left_empty(point(R,C)):- inside_bounds(R,C),
+left_empty(point(R,C)):- inside_bounds(point(R,C)),
                     C1 is C - 1 , C1 > 0, 
                     no_wall(point(R,C1)) , no_wall_num(point(R,C1),_).
 
 %to check if the top neighbour of a point is not a wall
-top_empty(point(R,C)):- inside_bounds(R,C), 
+top_empty(point(R,C)):- inside_bounds(point(R,C)), 
                     R1 is R - 1 ,R1 > 0, 
                     no_wall(point(R1,C)) , no_wall_num(point(R1,C),_).
 
 %to check if the bottom neighbour of a point is not a wall
-down_empty(point(R,C)):- size(Rmax,_),inside_bounds(R,C), 
+down_empty(point(R,C)):- size(Rmax,_),inside_bounds(point(R,C)), 
                     R1 is R + 1 ,R1 =< Rmax, 
                     no_wall(point(R1,C)) , no_wall_num(point(R1,C),_).
 
@@ -103,6 +103,16 @@ return_list_col(point(R,C),[UP,DOWN]):- return_list_up(point(R,C),UP),return_lis
 return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN]):- return_list_left(point(R,C),LEFT),return_list_right(point(R,C),RIGHT),return_list_up(point(R,C),UP),return_list_down(point(R,C),DOWN).
 
 lit(point(R,C)):- (light(point(R,C)) ,!); 
-                    ((return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN])), ((lit(point(R,C),LEFT),!); (lit(point(R,C),RIGHT),!); (lit(point(R,C),UP),!); (lit(point(R,C),DOWN),!))).
+                    ((return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN])), 
+                    ((lit(point(R,C),LEFT),!); (lit(point(R,C),RIGHT),!); (lit(point(R,C),UP),!); (lit(point(R,C),DOWN),!))).
 lit(point(_,_),[H|T]):- light(H),! ; lit(point(_,_),T).
 
+return_list_wall(Result):- findall(point(R,C),wall(point(R,C)),Result).
+return_list_wall_num(Result):- findall(point(R,C),wall_num(point(R,C),_),Result).
+return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
+
+all_cells:- all_cells([point(1,1)]).
+all_cells([point(R,C)]):- 
+
+all_cells_lit:- lit(point(1,1)).
+all_cells_lit(R,C):- lit(point(R,C)),R1 is R+1,all_cells_lit(R1,C).

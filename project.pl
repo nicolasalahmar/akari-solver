@@ -172,6 +172,11 @@ wall_num_check_lights(point(R,C),Num):- wall_num(point(R,C),Num), light_neighbor
 %all functions are working except for not light (eza btm7i shi naykak)
 
 %rita's code--------------------------------------------------------------------------------------------------------------------------------
+%counts lights in a list
+light_cells_count([],0).
+light_cells_count([H|T], LightCells):- light(H),light_cells_count(T, LightCells1), LightCells is LightCells1 + 1.
+light_cells_count([H|T], LightCells):- not(light(H)),light_cells_count(T,LightCells).
+
 %double light in row check
 no_double_light_row(point(R,C)):- return_list_row(point(R,C),List),flatten(List,List2),light_cells_count(List2, LightCells),LightCells=<1.
 %double light in column check

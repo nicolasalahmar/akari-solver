@@ -49,7 +49,7 @@ no_wall(point(R,C)):- not(wall(point(R,C))).
 %to check if a point is not a wall_num
 no_wall_num(point(R,C),_):- not(wall_num(point(R,C),_)).
 
-%to check if a point is inside the boudaries of the board
+%to check if a point is inside the boundaries of the board
 inside_bounds(R,C):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
 
 %to check if the right neighbour of a point is not a wall
@@ -106,3 +106,14 @@ lit(point(R,C)):- (light(point(R,C)) ,!);
                     ((return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN])), ((lit(point(R,C),LEFT),!); (lit(point(R,C),RIGHT),!); (lit(point(R,C),UP),!); (lit(point(R,C),DOWN),!))).
 lit(point(_,_),[H|T]):- light(H),! ; lit(point(_,_),T).
 
+
+% we check if the cell's neighbor is not a wall or an edge and then we add it to the list.
+right_neighbor(point(R,C),point(A,B)):- right_empty(point(R,C)), A is R, B is C+1.
+left_neighbor(point(R,C),point(A,B)):- left_empty(point(R,C)), A is R, B is C-1.
+up_neighbor(point(R,C),point(A,B)):- up_empty(point(R,C)), A is R-1, B is C.
+down_neighbor(point(R,C),point(A,B)):- down_empty(point(R,C)), A is R+1, B is C.
+%to return a list of a cell's neighbours
+neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),
+                                             left_neighbor(point(R,C),LEFT),
+                                             up_neighbor(point(R,C),UP),
+                                             down_neighbor(point(R,C),DOWN).

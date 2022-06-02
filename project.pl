@@ -107,8 +107,11 @@ lit(point(R,C)):- (light(point(R,C)) ,!);
                     ((lit(point(R,C),LEFT),!); (lit(point(R,C),RIGHT),!); (lit(point(R,C),UP),!); (lit(point(R,C),DOWN),!))).
 lit(point(_,_),[H|T]):- light(H),! ; lit(point(_,_),T).
 
+%return a list of all walls in the board
 return_list_wall(Result):- findall(point(R,C),wall(point(R,C)),Result).
+%returns a list of all numbered walls in a list
 return_list_wall_num(Result):- findall(point(R,C),wall_num(point(R,C),_),Result).
+%returns a list of all the lights in a board
 return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
 
@@ -130,6 +133,8 @@ neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),
                                              left_neighbor(point(R,C),LEFT),
                                              up_neighbor(point(R,C),UP),
                                              down_neighbor(point(R,C),DOWN).
+
+
 
 
 % we check if the cell's neighbor is not a wall or an edge [[[[and it is a light]]]]then we add it to the list.

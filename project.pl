@@ -76,17 +76,33 @@ down_empty(point(R,C)):- size(Rmax,_),inside_bounds(R,C),
 %to check if four sides empty and num is four then it is ready to be lit
 sides_empty(R,C):- right_empty(point(R,C)),left_empty(point(R,C)),top_empty(point(R,C)),down_empty(point(R,C)).
 
-return_list_right(point(R,C),[point(R,C)|_]):- not(right_empty(point(R,C))) ,!.
+%return list with all elements to the right of the cell until it hits a wall or the edge
+return_list_right(point(R,C),[point(R,C)]):- not(right_empty(point(R,C))) ,!.
 return_list_right(point(R,C),[point(R,C)|T]):- right_empty(point(R,C)), C1 is C+1 , return_list_right(point(R,C1),T) .
 
-return_list_left(point(R,C),[point(R,C)|_]):- not(left_empty(point(R,C))) ,!.
+%return list with all elements to the left of the cell until it hits a wall or the edge
+return_list_left(point(R,C),[point(R,C)]):- not(left_empty(point(R,C))) ,!.
 return_list_left(point(R,C),[point(R,C)|T]):- left_empty(point(R,C)), C1 is C-1 , return_list_left(point(R,C1),T).
 
-return_list_up(point(R,C),[point(R,C)|_]):- not(top_empty(point(R,C))) ,!.
+%return list with all elements up of the cell until it hits a wall or the edge
+return_list_up(point(R,C),[point(R,C)]):- not(top_empty(point(R,C))) ,!.
 return_list_up(point(R,C),[point(R,C)|T]):- top_empty(point(R,C)), R1 is R-1 , return_list_up(point(R1,C),T).
 
-return_list_down(point(R,C),[point(R,C)|_]):- not(down_empty(point(R,C))) ,!.
+%return list with all elements down of the cell until it hits a wall or the edge
+return_list_down(point(R,C),[point(R,C)]):- not(down_empty(point(R,C))) ,!.
 return_list_down(point(R,C),[point(R,C)|T]):- down_empty(point(R,C)), R1 is R+1 , return_list_down(point(R1,C),T).
 
+%note this function returns the same cell in the two lists example: [[point(1,2),point(1,1)],[point(1,2),point(1,3),point(1,4)]]
 %this function returns the same row without checking if it is lighted by another light.
-return_list_row(point(R,C),[RIGHT,LEFT]):- return_list_left(point(R,C),LEFT),return_list_right(point(R,C),RIGHT).
+return_list_row(point(R,C),[LEFT,RIGHT]):- return_list_left(point(R,C),LEFT),return_list_right(point(R,C),RIGHT).
+
+%this function returns the same row without checking if it is lighted by another light.
+%note this function returns the same cell in the two lists example: [[point(1,2),point(1,1)],[point(1,2),point(1,3),point(1,4)]]
+return_list_col(point(R,C),[UP,DOWN]):- return_list_up(point(R,C),UP),return_list_down(point(R,C),DOWN).
+
+return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN]):- return_list_left(point(R,C),LEFT),return_list_right(point(R,C),RIGHT),return_list_up(point(R,C),UP),return_list_down(point(R,C),DOWN).
+
+lit(point(R,C)):- (light(point(R,C)) ,!); 
+                    ((return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN])), ((lit(point(R,C),LEFT),!); (lit(point(R,C),RIGHT),!); (lit(point(R,C),UP),!); (lit(point(R,C),DOWN),!))).
+lit(point(_,_),[H|T]):- light(H),! ; lit(point(_,_),T).
+

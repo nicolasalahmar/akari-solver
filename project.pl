@@ -167,3 +167,12 @@ wall_num_check_lights(point(R,C),Num):- wall_num(point(R,C),Num), light_neighbor
 
 
 %fix not light==> when there is no light it returns false,we need to t=return empty, otherwise it is working(it detects lights and walls and edges)
+
+
+
+%double light in row check
+no_double_light_row(point(R,C)):- return_list_row(point(R,C),List),flatten(List,List2),light_cells_count(List2, LightCells),LightCells=<1.
+%double light in column check
+no_double_light_col(point(R,C)):- return_list_col(point(R,C),List),flatten(List,List2),light_cells_count(List2, LightCells),LightCells=<1.
+%double light check
+no_double_light(point(R,C)):-no_double_light_row(point(R,C)),no_double_light_col(point(R,C)).

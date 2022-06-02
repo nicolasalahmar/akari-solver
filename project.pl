@@ -140,8 +140,8 @@ neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),
 
 
 % we check if the cell's neighbor is not a wall or an edge [[[[and it is a light]]]]then we add it to the list.
+right_light_neighbor(point(R,C),[]):- not(right_empty(point(R,C))),!; (B is C+1,not(light(point(R,B)))),!.
 right_light_neighbor(point(R,C),point(R,B)):- light(point(R,B)), right_empty(point(R,C)), B is C+1,!.
-right_light_neighbor(point(R,C),[]):- not(right_empty(point(R,C))); (not(light(point(R,B))),B is C+1).
 
 left_light_neighbor(point(R,C),point(R,B)):- light(point(R,B)), left_empty(point(R,C)), B is C-1,!.
 left_light_neighbor(point(R,C),[]):- not(left_empty(point(R,C))); (not(light(point(R,B))),B is C-1).

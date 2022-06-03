@@ -208,12 +208,14 @@ return_full_col(R,C,[point(R,C)|T]):- R1 is R + 1 ,inside_bounds(point(R1,C)), r
 return_full_col(R,C,[point(R,C)]):- !.
 
 return_all_points(Result):- return_full_col(1,TheCol),return_all_points(Result,TheCol,[]).
-return_all_points(Result,[point(Khara,_)|T],[]):- return_full_row(Khara,TheRow), return_all_points(Result,T,TheRow),!.
-return_all_points(Result,[point(Khara,_)|T],Acc):- return_full_row(Khara,TheRow) , append(Acc,TheRow,NewAcc),return_all_points(Result,T,NewAcc),!.
-return_all_points(NewAcc,[point(Khara,_)],Acc):- return_full_row(Khara,TheRow) , append(Acc,TheRow,NewAcc).
+return_all_points(Result,[point(Var,_)|T],[]):- return_full_row(Var,TheRow), return_all_points(Result,T,TheRow),!.
+return_all_points(Result,[point(Var,_)|T],Acc):- return_full_row(Var,TheRow) , append(Acc,TheRow,NewAcc),return_all_points(Result,T,NewAcc),!.
+return_all_points(NewAcc,[point(Var,_)],Acc):- return_full_row(Var,TheRow) , append(Acc,TheRow,NewAcc).
 
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 
 all_cells_lit:- return_all_points(Result),all_cells_lit(Result),!.
 all_cells_lit([H|T]):- lit(H),all_cells_lit(T).
 all_cells_lit([H]):- lit(H).
+
+solved:- all_cells_lit,no_double_light.

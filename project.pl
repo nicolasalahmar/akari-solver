@@ -143,14 +143,14 @@ neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),
 right_light_neighbor(point(R,C),[]):- not(right_empty(point(R,C))),!; (B is C+1,not(light(point(R,B)))),!.
 right_light_neighbor(point(R,C),point(R,B)):- light(point(R,B)), right_empty(point(R,C)), B is C+1,!.
 
+left_light_neighbor(point(R,C),[]):- not(left_empty(point(R,C))),!; (B is C-1,not(light(point(R,B)))),!.
 left_light_neighbor(point(R,C),point(R,B)):- light(point(R,B)), left_empty(point(R,C)), B is C-1,!.
-left_light_neighbor(point(R,C),[]):- not(left_empty(point(R,C))); (not(light(point(R,B))),B is C-1).
 
+up_light_neighbor(point(R,C),[]):- not(up_empty(point(R,C))),!; (A is R-1,not(light(point(A,C)))),!.
 up_light_neighbor(point(R,C),point(A,C)):- light(point(A,C)), up_empty(point(R,C)), A is R-1,!.
-up_light_neighbor(point(R,C),[]):- not(up_empty(point(R,C))); (not(light(point(A,C))),A is R-1).
 
+down_light_neighbor(point(R,C),[]):- not(down_empty(point(R,C))),!; (A is R+1,not(light(point(A,C)))),!.
 down_light_neighbor(point(R,C),point(A,C)):- light(point(A,C)), down_empty(point(R,C)), A is R+1,!.
-down_light_neighbor(point(R,C),[]):- not(down_empty(point(R,C))); (not(light(point(A,C))),A is R+1).
 
 %to return a list of a cell's neighbors that are lights
 light_neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_light_neighbor(point(R,C),RIGHT),
@@ -168,8 +168,7 @@ count([H|T], N) :- count(T, N1), ((H\=[])-> N is N1 + 1 ; N = N1).
 wall_num_check_lights(point(R,C),Num):- wall_num(point(R,C),Num), light_neighbors(point(R,C),X),count(X,Num).
 
 
-%fix not light==> when there is no light it returns false,we need to t=return empty, otherwise it is working(it detects lights and walls and edges)
-%all functions are working except for not light (eza btm7i shi naykak)
+
 
 %rita's code--------------------------------------------------------------------------------------------------------------------------------
 %counts lights in a list

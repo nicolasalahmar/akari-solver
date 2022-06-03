@@ -164,9 +164,15 @@ light_neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_light_neighbor(point(R,
 %helper function to count the number of elements in a list and ignore empty lists
 count([],0).
 count([H|T], N) :- count(T, N1), ((H\=[])-> N is N1 + 1 ; N = N1).
+%helper function to return the number in a wall num cell
+return_num(point(R,C),Num):- wall_num(point(R,C),Num).
+return_num(point(R,C),0):- not(wall_num(point(R,C),_)).
 %the actual function
-wall_num_check_lights(point(R,C),Num):- wall_num(point(R,C),Num), light_neighbors(point(R,C),X),count(X,Num).
-
+wall_num_check_lights(point(R,C)):- return_num(point(R,C),Num),wall_num(point(R,C),Num),light_neighbors(point(R,C),X),count(X,Num).
+%to check lights around wall nums in all the board
+light_count_correct():- return_list_wall_num(Result),light_count_correct(Result).
+light_count_correct([point(R,C)|T]):- wall_num_check_lights(point(R,C)),light_count_correct(T).
+light_count_correct([]):-!.
 
 
 
@@ -195,9 +201,9 @@ return_full_col(R,C,[point(R,C)|T]):- R1 is R + 1 ,inside_bounds(point(R1,C)), r
 return_full_col(R,C,[point(R,C)]):- !.
 
 return_all_points(Result):- return_full_col(1,TheCol),return_all_points(Result,TheCol,[]).
-return_all_points(Result,[point(Khara,_)|T],[]):- return_full_row(Khara,TheRow), return_all_points(Result,T,TheRow),!.
-return_all_points(Result,[point(Khara,_)|T],Acc):- return_full_row(Khara,TheRow) , append(Acc,TheRow,NewAcc),return_all_points(Result,T,NewAcc),!.
-return_all_points(NewAcc,[point(Khara,_)],Acc):- return_full_row(Khara,TheRow) , append(Acc,TheRow,NewAcc).
+return_all_points(Result,[point(K,_)|T],[]):- return_full_row(K,TheRow), return_all_points(Result,T,TheRow),!.
+return_all_points(Result,[point(K,_)|T],Acc):- return_full_row(K,TheRow) , append(Acc,TheRow,NewAcc),return_all_points(Result,T,NewAcc),!.
+return_all_points(NewAcc,[point(K,_)],Acc):- return_full_row(K,TheRow) , append(Acc,TheRow,NewAcc).
 
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 

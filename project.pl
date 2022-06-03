@@ -59,17 +59,17 @@ right_empty(point(R,C)):- size(_,Cmax), inside_bounds(point(R,C)),
 
 %to check if the left neighbour of a point is not a wall
 left_empty(point(R,C)):- inside_bounds(point(R,C)),
-                    C1 is C - 1 , C1 > 0, 
+                    C1 is C - 1 , C1 > 0,
                     no_wall(point(R,C1)) , no_wall_num(point(R,C1),_).
 
 %to check if the top neighbour of a point is not a wall
-up_empty(point(R,C)):- inside_bounds(point(R,C)), 
-                    R1 is R - 1 ,R1 > 0, 
+up_empty(point(R,C)):- inside_bounds(point(R,C)),
+                    R1 is R - 1 ,R1 > 0,
                     no_wall(point(R1,C)) , no_wall_num(point(R1,C),_).
 
 %to check if the bottom neighbour of a point is not a wall
-down_empty(point(R,C)):- size(Rmax,_),inside_bounds(point(R,C)), 
-                    R1 is R + 1 ,R1 =< Rmax, 
+down_empty(point(R,C)):- size(Rmax,_),inside_bounds(point(R,C)),
+                    R1 is R + 1 ,R1 =< Rmax,
                     no_wall(point(R1,C)) , no_wall_num(point(R1,C),_).
 
 
@@ -102,8 +102,8 @@ return_list_col(point(R,C),[UP,DOWN]):- return_list_up(point(R,C),UP),return_lis
 
 return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN]):- return_list_left(point(R,C),LEFT),return_list_right(point(R,C),RIGHT),return_list_up(point(R,C),UP),return_list_down(point(R,C),DOWN).
 
-lit(point(R,C)):- (light(point(R,C)) ,!); 
-                    ((return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN])), 
+lit(point(R,C)):- (light(point(R,C)) ,!);
+                    ((return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN])),
                     ((lit(point(R,C),LEFT),!); (lit(point(R,C),RIGHT),!); (lit(point(R,C),UP),!); (lit(point(R,C),DOWN),!))).
 lit(point(_,_),[H|T]):- light(H),! ; lit(point(_,_),T).
 
@@ -177,15 +177,27 @@ light_cells_count([],0).
 light_cells_count([H|T], LightCells):- light(H),light_cells_count(T, LightCells1), LightCells is LightCells1 + 1.
 light_cells_count([H|T], LightCells):- not(light(H)),light_cells_count(T,LightCells).
 
+remove_duplicates([],[]).
+remove_duplicates([H | T], List) :- member(H, T),remove_duplicates( T, List).
+remove_duplicates([H | T], [H|T1]) :- \+member(H, T),remove_duplicates( T, T1).
 %double light in row check
-no_double_light_row(point(R,C)):- return_list_row(point(R,C),List),flatten(List,List2),light_cells_count(List2, LightCells),LightCells=<1.
-%double light in column check
-no_double_light_col(point(R,C)):- return_list_col(point(R,C),List),flatten(List,List2),light_cells_count(List2, LightCells),LightCells=<1.
-%double light check
-no_double_light(point(R,C)):-no_double_light_row(point(R,C)),no_double_light_col(point(R,C)).
+no_double_light_row:-return_all_points(Result),no_double_light_row(Result).
+no_double_light_row([H|T]):-not(wall(H)),return_list_row(H,Row),flatten(Row,RowList),
+ remove_duplicates(RowList,FinalRow),light_cells_count(FinalRow,
+ LightCells),
+LightCells=<1,no_double_light_row(T),!.
+no_double_light_row([H|T]):-wall(H),no_double_light_row(T),!.
+no_double_light_row([]):-!.
 
 
-
+no_double_light_col:-return_all_points(Result),no_double_light_col(Result).
+no_double_light_col([H|T]):-not(wall(H)),return_list_col(H,Col),flatten(Col,ColList),
+ remove_duplicates(ColList,FinalCol),light_cells_count(FinalCol,
+ LightCells),
+LightCells=<1,no_double_light_col(T),!.
+no_double_light_col([H|T]):-wall(H),no_double_light_col(T),!.
+no_double_light_col([]):-!.
+no_double_light:-no_double_light_col,no_double_light_row.
 %nicolas's code--------------------------------------------------------------------------------------------------------------------------------
 return_full_row(R,[point(R,1)|T]):- return_full_row(R,2,T) .
 return_full_row(R,C,[point(R,C)|T]):- C1 is C+1 ,inside_bounds(point(R,C1)), return_full_row(R,C1,T),!.

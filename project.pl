@@ -170,7 +170,7 @@ return_num(point(R,C),0):- not(wall_num(point(R,C),_)).
 %the actual function
 wall_num_check_lights(point(R,C)):- return_num(point(R,C),Num),wall_num(point(R,C),Num),light_neighbors(point(R,C),X),count(X,Num).
 %to check lights around wall nums in all the board
-light_count_correct():- return_list_wall_num(Result),light_count_correct(Result).
+light_count_correct:- return_list_wall_num(Result),light_count_correct(Result),!.
 light_count_correct([point(R,C)|T]):- wall_num_check_lights(point(R,C)),light_count_correct(T).
 light_count_correct([]):-!.
 
@@ -223,4 +223,4 @@ all_cells_lit:- return_all_points(Result),all_cells_lit(Result),!.
 all_cells_lit([H|T]):- lit(H),all_cells_lit(T).
 all_cells_lit([H]):- lit(H).
 
-solved:- all_cells_lit,no_double_light.
+solved:- all_cells_lit,no_double_light,light_count_correct.

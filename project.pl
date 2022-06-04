@@ -90,6 +90,7 @@ return_list_col(point(R,C),[UP,DOWN]):- return_list_up(point(R,C),UP),return_lis
 
 return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN]):- return_list_left(point(R,C),LEFT),return_list_right(point(R,C),RIGHT),return_list_up(point(R,C),UP),return_list_down(point(R,C),DOWN).
 
+%to check if a cell is lit (hit with some light
 lit(point(R,C)):- (light(point(R,C)) ,!);
                     ((return_list_row_col(point(R,C),[LEFT,RIGHT,UP,DOWN])),
                     ((lit(point(R,C),LEFT),!); (lit(point(R,C),RIGHT),!); (lit(point(R,C),UP),!); (lit(point(R,C),DOWN),!))).
@@ -196,6 +197,7 @@ no_double_light_col([H|T]):-wall(H),no_double_light_col(T),!.
 no_double_light_col([]):-!.
 no_double_light:-no_double_light_col,no_double_light_row.
 %--------------------------------------------------------------------------------------------------------------------------------
+%helper functions to return a row, a column of a full board
 return_full_row(R,[point(R,1)|T]):- return_full_row(R,2,T) .
 return_full_row(R,C,[point(R,C)|T]):- C1 is C+1 ,inside_bounds(point(R,C1)), return_full_row(R,C1,T),!.
 return_full_row(R,C,[point(R,C)]):- !.
@@ -209,16 +211,17 @@ return_all_points(Result,[point(K,_)|T],[]):- return_full_row(K,TheRow), return_
 return_all_points(Result,[point(K,_)|T],Acc):- return_full_row(K,TheRow) , append(Acc,TheRow,NewAcc),return_all_points(Result,T,NewAcc),!.
 return_all_points(NewAcc,[point(K,_)],Acc):- return_full_row(K,TheRow) , append(Acc,TheRow,NewAcc).
 
+%helper function to return the type of each point in the board (wall,wallnum, etc..).
 return_all_points_type(AllPointsType):- return_all_points(AllPoints),return_all_points_type(AllPoints,AllPointsType).
 
 return_all_points_type([point(R,C)|T1],[wall(point(R,C))|T2]):- wall(point(R,C)),return_all_points_type(T1,T2),!.
 return_all_points_type([point(R,C)|T1],[wall_num(point(R,C),_)|T2]):- wall_num(point(R,C),_),return_all_points_type(T1,T2),!.
 return_all_points_type([point(R,C)|T1],[light(point(R,C))|T2]):- light(point(R,C)),return_all_points_type(T1,T2),!.
 
-%return_all_points_type([point(R,C)],[wall(R,C)|T]):- wall(point(R,C)).
 
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 
+%to check if all cells in the board are lit.
 all_cells_lit:- return_all_points(Result),all_cells_lit(Result),!.
 all_cells_lit([H|T]):- lit(H),all_cells_lit(T).
 all_cells_lit([H]):- lit(H).
@@ -228,7 +231,7 @@ solved:- all_cells_lit,no_double_light,light_count_correct.
 %--------------------------------------------------SOLUTION SECTION------------------------------------------------------------------------------
 
 
-%nigoghosian's code=====================================================================================================
+%nigoghosian's code--------------------------------------------------------------------------------------------------------------------------=
 %defining our dynamic variables
 :-dynamic light/1.
 :-dynamic nolight/1.
@@ -266,6 +269,7 @@ disable_light_number_zero_right(point(R,C)):-C2 is C+1,not(inside_bounds(point(R
 disable_light_number_zero(point(R,C)):-disable_light_number_zero_top(point(R,C)),disable_light_number_zero_bottom(point(R,C)),disable_light_number_zero_left(point(R,C)),disable_light_number_zero_right(point(R,C)).
 
 %nicolas' code------------------------------------------------------------------------------------------------------------
+%print board functions.
 return_full_row_type(R,AllPointsType,_):- return_full_row(R,AllPoints),return_full_row_type(AllPoints,AllPointsType).
 
 return_full_row_type([point(R,C)|T1],[wall_num(point(R,C),N)|T2]):- wall_num(point(R,C),N),return_full_row_type(T1,T2),!.
@@ -284,21 +288,22 @@ print_row(R,_,_):- return_full_row_type(R,Board,2),print_row(Board).
 
 print_row([wall_num(point(_,_),N)|T]):- write(N),write(' '),print_row(T),!.
 print_row([wall(point(_,_))|T]):- write('#'),write(' '),print_row(T),!.
-print_row([light(point(_,_))|T]):- write('O'),write(' '),print_row(T),!.
-print_row([lit(point(_,_))|T]):- write('X'),write(' '),print_row(T),!.
-print_row([point(_,_)|T]):- write('_'),write(' '),print_row(T),!.
+print_row([light(point(_,_))|T]):- write('o'),write(' '),print_row(T),!.
+print_row([lit(point(_,_))|T]):- write('x'),write(' '),print_row(T),!.
+print_row([point(_,_)|T]):- write('-'),write(' '),print_row(T),!.
 
 print_row([wall_num(point(_,_),N)]):- write(N),!.
 print_row([wall(point(_,_))]):- write('#'),!.
-print_row([light(point(_,_))]):- write('O'),!.
-print_row([lit(point(_,_))]):- write('X'),!.
-print_row([point(_,_)]):- write('_'),!.
+print_row([light(point(_,_))]):- write('o'),!.
+print_row([lit(point(_,_))]):- write('x'),!.
+print_row([point(_,_)]):- write('-'),!.
 
 print_board:- size(_,Cmax),print_board(1,Cmax).
 print_board(R,Cmax):- R>Cmax,!.
 print_board(R,Cmax):- print_row(R,_,_),write('\n'),R1 is R+1, print_board(R1,Cmax).
 
 % george's code -----------------------------------------------------------------------------------------------------------
+%to put lights in obvious spots such as wallnum(4) and wallnum(3) that has only 3 neighbors for example
 light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),Num),
                                         wall_num(point(R,C),Num), 
                                         neighbors(point(R,C),List),

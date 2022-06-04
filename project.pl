@@ -332,3 +332,5 @@ print_row([point(_,_)]):- write('_'),!.
 print_board:- size(_,Cmax),print_board(1,Cmax).
 print_board(R,Cmax):- R>Cmax,!.
 print_board(R,Cmax):- print_row(R,_,_),write('\n'),R1 is R+1, print_board(R1,Cmax).
+
+%ldmkl

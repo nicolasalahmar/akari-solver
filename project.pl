@@ -2,47 +2,40 @@
 size(10,10).
 
 %walls
-wall(point(1,1)).
 wall(point(1,3)).
-wall(point(1,4)).
-wall(point(1,6)).
-wall(point(1,7)).
-wall(point(1,10)).
-wall(point(3,6)).
-wall(point(3,7)).
+wall(point(2,4)).
+wall(point(2,6)).
+wall(point(3,4)).
 wall(point(3,10)).
-wall(point(4,1)).
-wall(point(4,3)).
-wall(point(4,10)).
-wall(point(5,1)).
-wall(point(5,3)).
-wall(point(6,8)).
-wall(point(6,10)).
-wall(point(7,1)).
-wall(point(7,8)).
-wall(point(7,10)).
+wall(point(4,4)).
+wall(point(4,7)).
+wall(point(4,8)).
+wall(point(4,9)).
+wall(point(5,2)).
+wall(point(6,9)).
+wall(point(7,2)).
+wall(point(7,3)).
+wall(point(7,4)).
+wall(point(7,7)).
 wall(point(8,1)).
-wall(point(8,4)).
-wall(point(8,5)).
-wall(point(10,1)).
-wall(point(10,4)).
-wall(point(10,5)).
-wall(point(10,7)).
+wall(point(8,7)).
+wall(point(9,5)).
+wall(point(9,7)).
 wall(point(10,8)).
-wall(point(10,10)).
+
 
 %wall_num
-wall_num(point(1,3),1).
-wall_num(point(3,7),2).
-wall_num(point(4,1),1).
-wall_num(point(4,10),1).
-wall_num(point(5,1),2).
-wall_num(point(7,10),0).
-wall_num(point(8,4),2).
-wall_num(point(10,5),2).
-wall_num(point(10,10),1).
-
-
+wall_num(point(1,3),2).
+wall_num(point(2,6),2).
+wall_num(point(3,10),3).
+wall_num(point(4,4),1).
+wall_num(point(5,2),2).
+wall_num(point(7,4),1).
+wall_num(point(7,7),1).
+wall_num(point(8,1),1).
+wall_num(point(8,7),1).
+wall_num(point(9,5),1).
+wall_num(point(10,8),1).
 
 
 
@@ -346,7 +339,7 @@ light_up_all_obvious([],[]):-print_board,!.
 cc():- consult('project.pl'),clear().
 c():- consult('project.pl').
 p():-print_board.
-
+s():-set_prolog_flag(answer_write_options,[max_depth(0)]).
 %function to keep solving all obvious wall nums repeatedly until no more obvious wall nums are found.
 % we store all results (true or false) in a list and keep looping through this function until there is no true in the list
 % which means that the function cannot light up any abvious wallnums because there aren't any left.

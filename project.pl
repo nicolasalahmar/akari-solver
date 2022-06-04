@@ -25,20 +25,7 @@ wall_num(point(6,2),2).
 wall_num(point(7,6),1).
 
 %lights
-light(point(1,2)).
-light(point(1,7)).
-light(point(2,1)).
-light(point(2,8)).
-light(point(3,2)).
-light(point(4,4)).
-light(point(4,6)).
-light(point(5,3)).
-light(point(5,5)).
-light(point(6,1)).
-light(point(6,4)).
-light(point(7,2)).
-light(point(7,8)).
-light(point(8,6)).
+
 
 
 %rules
@@ -224,7 +211,7 @@ return_all_points_type([point(R,C)|T1],[wall(point(R,C))|T2]):- wall(point(R,C))
 return_all_points_type([point(R,C)|T1],[wall_num(point(R,C),_)|T2]):- wall_num(point(R,C),_),return_all_points_type(T1,T2),!.
 return_all_points_type([point(R,C)|T1],[light(point(R,C))|T2]):- light(point(R,C)),return_all_points_type(T1,T2),!.
 
-return_all_points_type([point(R,C)],[wall(R,C)|T]):- wall(point(R,C)),.
+%return_all_points_type([point(R,C)],[wall(R,C)|T]):- wall(point(R,C)).
 
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 
@@ -274,24 +261,13 @@ disable_light_number_zero_right(point(R,C)):-C2 is C+1,not(inside_bounds(point(R
 
 disable_light_number_zero(point(R,C)):-disable_light_number_zero_top(point(R,C)),disable_light_number_zero_bottom(point(R,C)),disable_light_number_zero_left(point(R,C)),disable_light_number_zero_right(point(R,C)).
 
-%johny's code=====================================================================================================
-%axomatics
-%count list elements
-count_e([],0).
-count_e([H|T],N):-count_e(T,N1),N is N1+1.
-%count neighbors list elements
-neighbors_count(X,Y,Z):-neighbors(point(X,Y),Elements),flatten(Elements,F_Elements),count_e(F_Elements,Z).
-%return the number in the wall
-return_wall_num(X,Y,Z):-wall_num(point(X,Y),Z).
-%check if number of the wall is 4
-check_wall_num_4(X,Y):-return_wall_num(X,Y,Z),Z = 4.
-%check if number of the wall is 0
-check_wall_num_0(X,Y):-return_wall_num(X,Y,Z),Z = 0.
-%check if number of the wall is 2
-check_wall_num_2(X,Y):-return_wall_num(X,Y,Z),Z = 2.
-%check if number of the wall is 3
-check_wall_num_3(X,Y):-return_wall_num(X,Y,Z),Z = 3.
-%check if the cell in the corner
-check_corner(X,Y):-neighbors_count(X,Y,Z),Z = 2.
-%check if the cell in the edge
-check_edge(X,Y):-neighbors_count(X,Y,Z),Z = 3.
+
+% george's code -----------------------------------------------------------------------------------------------------------
+light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),Num),
+                                        wall_num(point(R,C),Num), 
+                                        neighbors(point(R,C),List),
+                                        count(List,Num),
+                                        light_up_obvious_neighbors(List).
+light_up_obvious_neighbors([point(R,C)|T]):-(not(lit(point(R,C))),assertz(light(point(R,C))),light_up_obvious_neighbors(T)).
+light_up_obvious_neighbors([[]|T]):-light_up_obvious_neighbors(T).
+light_up_obvious_neighbors([]):-!.

@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 size(8,8).
 
 %walls
@@ -213,6 +211,7 @@ return_all_points_type([point(R,C)|T1],[wall(point(R,C))|T2]):- wall(point(R,C))
 return_all_points_type([point(R,C)|T1],[wall_num(point(R,C),_)|T2]):- wall_num(point(R,C),_),return_all_points_type(T1,T2),!.
 return_all_points_type([point(R,C)|T1],[light(point(R,C))|T2]):- light(point(R,C)),return_all_points_type(T1,T2),!.
 
+%return_all_points_type([point(R,C)],[wall(R,C)|T]):- wall(point(R,C)).
 
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 
@@ -305,4 +304,3 @@ print_row([point(_,_)]):- write('_'),!.
 print_board:- size(_,Cmax),print_board(1,Cmax).
 print_board(R,Cmax):- R>Cmax,!.
 print_board(R,Cmax):- print_row(R,_,_),write('\n'),R1 is R+1, print_board(R1,Cmax).
->>>>>>> db6814494377c375863c6bcb82e205820d304a62

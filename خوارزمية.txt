@@ -1,0 +1,14 @@
+loop for axiomatic :
+4 , 0 , corner (2), edges (3)
+2 حدو حيطين مو مرقمين
+3 حدا حيط بلا رقم
+1 3 حيطان بلا رقم
+خلية بين 4 حيطان ( تحتاج ضوء)
+
+________________
+الخلية مضاءة ؟
+
+1. search  for wall nums
+2. get neighbors
+3. check if neighbor is lit
+

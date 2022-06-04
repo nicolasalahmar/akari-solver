@@ -1,32 +1,3 @@
-size(8,8).
-
-%walls
-wall(point(1,6)).
-wall(point(2,2)).
-wall(point(2,3)).
-wall(point(3,7)).
-wall(point(4,1)).
-wall(point(4,5)).
-wall(point(5,4)).
-wall(point(5,8)).
-wall(point(6,2)).
-wall(point(7,6)).
-wall(point(7,7)).
-wall(point(8,3)).
-
-
-%wall_num
-wall_num(point(1,6),1).
-wall_num(point(2,2),3).
-wall_num(point(3,7),0).
-wall_num(point(5,4),4).
-wall_num(point(5,8),0).
-wall_num(point(6,2),2).
-wall_num(point(7,6),1).
-
-%lights
-
-
 
 %rules
 
@@ -313,14 +284,16 @@ light_up_obvious_neighbors([point(R,C)|T]):-(not(lit(point(R,C))),assertz(light(
 light_up_obvious_neighbors([[]|T]):-light_up_obvious_neighbors(T),!.
 light_up_obvious_neighbors([]):-!.
 
-%to light up all obvious wallnums in the row
-light_up_all_obvious:- return_list_wall_num(List), light_up_all_obvious(List,0).
+%to light up all obvious wallnums in the board.
 
-light_up_all_obvious([point(R,C)|T],Trues):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),light_up_all_obvious(T,Trues),!.
-light_up_all_obvious([point(R,C)|T],Trues):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))),light_up_all_obvious(T,Trues),!.
-light_up_all_obvious([point(R,C)],Trues):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),!.
-light_up_all_obvious([point(R,C)],Trues):- not(light_up_obvious_neighbors(point(R,C))),!.
-light_up_all_obvious([],Trues):-print_board,!.
+
+light_up_all_obvious(Status):- return_list_wall_num(List), light_up_all_obvious(List,Status).
+
+light_up_all_obvious([],[]):-print_board,!.
+light_up_all_obvious([point(R,C)],[1]):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),!.
+light_up_all_obvious([point(R,C)],[[]]):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))),!.
+light_up_all_obvious([point(R,C)|T],[1|T1]):-print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),light_up_all_obvious(T,T1),!.
+light_up_all_obvious([point(R,C)|T],[[]|T1]):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))),light_up_all_obvious(T,T1),!.
 
 %helper function to clear, consult, and print quickly
 cc():- consult('project.pl'),clear().
@@ -328,4 +301,10 @@ c():- consult('project.pl').
 p():-print_board.
 
 %function to keep solving all obvious wall nums repeatedly until no more obvious wall nums are found.
-solve_all_obvious():-write('///////////////new pass//////////////////// \n'),light_up_all_obvious().
+% we store all results (true or false) in a list and keep looping through this function until there is no true in the list
+% which means that the function cannot light up any abvious wallnums because there aren't any left.
+solve_all_obvious():-write('///////////////new pass//////////////////// \n'),
+                     light_up_all_obvious(List),count(List,Num), Num>0.
+       
+solve_all_obvious(0).
+solve_all_obvious(Num):-light_up_all_obvious(List),count(List,Num), Num>0,solve_all_obvious(Num2).

@@ -1,4 +1,52 @@
 
+size(10,10).
+
+%walls
+wall(point(1,1)).
+wall(point(1,3)).
+wall(point(1,4)).
+wall(point(1,6)).
+wall(point(1,7)).
+wall(point(1,10)).
+wall(point(3,6)).
+wall(point(3,7)).
+wall(point(3,10)).
+wall(point(4,1)).
+wall(point(4,3)).
+wall(point(4,10)).
+wall(point(5,1)).
+wall(point(5,3)).
+wall(point(6,8)).
+wall(point(6,10)).
+wall(point(7,1)).
+wall(point(7,8)).
+wall(point(7,10)).
+wall(point(8,1)).
+wall(point(8,4)).
+wall(point(8,5)).
+wall(point(10,1)).
+wall(point(10,4)).
+wall(point(10,5)).
+wall(point(10,7)).
+wall(point(10,8)).
+wall(point(10,10)).
+
+%wall_num
+wall_num(point(1,3),1).
+wall_num(point(3,7),2).
+wall_num(point(4,1),1).
+wall_num(point(4,10),1).
+wall_num(point(5,1),2).
+wall_num(point(7,10),0).
+wall_num(point(8,4),2).
+wall_num(point(10,5),2).
+wall_num(point(10,10),1).
+
+
+
+
+
+
 %rules
 
 %-------------------------------------------TESTING SECTION----------------------------------------------------------------------------------
@@ -80,19 +128,19 @@ return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 % we check if the cell's neighbor is not a wall or an edge or lit and then we add it to the list(returns only empty cells that are not lit).
 right_neighbor(point(R,C),point(R,B)):- B is C+1,not(lit(point(R,B))),right_empty(point(R,C)),!.
 right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))),!.
-right_neighbor(point(R,C),[]):- lit(point(R,C)).
+right_neighbor(point(R,C),[]):- B is C+1,lit(point(R,B)).
 
 left_neighbor(point(R,C),point(R,B)):- B is C-1,not(lit(point(R,B))),left_empty(point(R,C)),!.
 left_neighbor(point(R,C),[]):- not(left_empty(point(R,C))),!.
-left_neighbor(point(R,C),[]):- lit(point(R,C)).
+left_neighbor(point(R,C),[]):- B is C-1, lit(point(R,B)).
 
 up_neighbor(point(R,C),point(A,C)):- A is R-1,not(lit(point(A,C))),up_empty(point(R,C)),!.
 up_neighbor(point(R,C),[]):- not(up_empty(point(R,C))),!.
-up_neighbor(point(R,C),[]):- lit(point(R,C)).
+up_neighbor(point(R,C),[]):- A is R-1, lit(point(A,C)).
 
 down_neighbor(point(R,C),point(A,C)):- A is R+1, not(lit(point(A,C))),down_empty(point(R,C)),!.
 down_neighbor(point(R,C),[]):- not(down_empty(point(R,C))),!.
-down_neighbor(point(R,C),[]):- lit(point(R,C)).
+down_neighbor(point(R,C),[]):- A is R+1, lit(point(A,C)).
 
 %to return a list of a cell's neighbors
 neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),
@@ -288,12 +336,11 @@ light_up_obvious_neighbors([]):-!.
 
 
 light_up_all_obvious(Status):- return_list_wall_num(List), light_up_all_obvious(List,Status).
-
-light_up_all_obvious([],[]):-print_board,!.
-light_up_all_obvious([point(R,C)],[1]):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),!.
-light_up_all_obvious([point(R,C)],[[]]):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))),!.
+%light_up_all_obvious([point(R,C)],[1]):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)).
+%light_up_all_obvious([point(R,C)],[[]]):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))).
 light_up_all_obvious([point(R,C)|T],[1|T1]):-print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),light_up_all_obvious(T,T1),!.
 light_up_all_obvious([point(R,C)|T],[[]|T1]):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))),light_up_all_obvious(T,T1),!.
+light_up_all_obvious([],[]):-print_board,!.
 
 %helper function to clear, consult, and print quickly
 cc():- consult('project.pl'),clear().
@@ -307,4 +354,4 @@ solve_all_obvious():-write('///////////////new pass//////////////////// \n'),
                      light_up_all_obvious(List),count(List,Num), Num>0.
        
 solve_all_obvious(0).
-solve_all_obvious(Num):-light_up_all_obvious(List),count(List,Num), Num>0,solve_all_obvious(Num2).
+solve_all_obvious(Num):-light_up_all_obvious(List),count(List,Num), Num>0,solve_all_obvious(_).

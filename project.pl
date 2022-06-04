@@ -211,7 +211,6 @@ return_all_points_type([point(R,C)|T1],[wall(point(R,C))|T2]):- wall(point(R,C))
 return_all_points_type([point(R,C)|T1],[wall_num(point(R,C),_)|T2]):- wall_num(point(R,C),_),return_all_points_type(T1,T2),!.
 return_all_points_type([point(R,C)|T1],[light(point(R,C))|T2]):- light(point(R,C)),return_all_points_type(T1,T2),!.
 
-%return_all_points_type([point(R,C)],[wall(R,C)|T]):- wall(point(R,C)).
 
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 
@@ -271,3 +270,36 @@ light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),Num),
 light_up_obvious_neighbors([point(R,C)|T]):-(not(lit(point(R,C))),assertz(light(point(R,C))),light_up_obvious_neighbors(T)).
 light_up_obvious_neighbors([[]|T]):-light_up_obvious_neighbors(T).
 light_up_obvious_neighbors([]):-!.
+
+%nicolas' code------------------------------------------------------------------------------------------------------------
+return_full_row_type(R,AllPointsType,_):- return_full_row(R,AllPoints),return_full_row_type(AllPoints,AllPointsType).
+
+return_full_row_type([point(R,C)|T1],[wall_num(point(R,C),N)|T2]):- wall_num(point(R,C),N),return_full_row_type(T1,T2),!.
+return_full_row_type([point(R,C)|T1],[wall(point(R,C))|T2]):- wall(point(R,C)),return_full_row_type(T1,T2),!.
+return_full_row_type([point(R,C)|T1],[light(point(R,C))|T2]):- light(point(R,C)),return_full_row_type(T1,T2),!.
+return_full_row_type([point(R,C)|T1],[lit(point(R,C))|T2]):- lit(point(R,C)),return_full_row_type(T1,T2),!.
+return_full_row_type([point(R,C)|T1],[point(R,C)|T2]):- return_full_row_type(T1,T2),!.
+
+return_full_row_type([point(R,C)],[wall(point(R,C))]):- wall(point(R,C)),!.
+return_full_row_type([point(R,C)],[wall_num(point(R,C),_)]):- wall_num(point(R,C),_),!.
+return_full_row_type([point(R,C)],[light(point(R,C))]):- light(point(R,C)),!.
+return_full_row_type([point(R,C)],[lit(point(R,C))]):- lit(point(R,C)),!.
+return_full_row_type([point(R,C)],[point(R,C)]).
+
+print_row(R,_,_):- return_full_row_type(R,Board,2),print_row(Board).
+
+print_row([wall_num(point(_,_),N)|T]):- write(N),write(' '),print_row(T),!.
+print_row([wall(point(_,_))|T]):- write('#'),write(' '),print_row(T),!.
+print_row([light(point(_,_))|T]):- write('O'),write(' '),print_row(T),!.
+print_row([lit(point(_,_))|T]):- write('X'),write(' '),print_row(T),!.
+print_row([point(_,_)|T]):- write('_'),write(' '),print_row(T),!.
+
+print_row([wall_num(point(_,_),N)]):- write(N),!.
+print_row([wall(point(_,_))]):- write('#'),!.
+print_row([light(point(_,_))]):- write('O'),!.
+print_row([lit(point(_,_))]):- write('X'),!.
+print_row([point(_,_)]):- write('_'),!.
+
+print_board:- size(_,Cmax),print_board(1,Cmax).
+print_board(R,Cmax):- R>Cmax,!.
+print_board(R,Cmax):- print_row(R,_,_),write('\n'),R1 is R+1, print_board(R1,Cmax).

@@ -218,6 +218,14 @@ return_all_points(Result,[point(K,_)|T],[]):- return_full_row(K,TheRow), return_
 return_all_points(Result,[point(K,_)|T],Acc):- return_full_row(K,TheRow) , append(Acc,TheRow,NewAcc),return_all_points(Result,T,NewAcc),!.
 return_all_points(NewAcc,[point(K,_)],Acc):- return_full_row(K,TheRow) , append(Acc,TheRow,NewAcc).
 
+return_all_points_type(AllPointsType):- return_all_points(AllPoints),return_all_points_type(AllPoints,AllPointsType).
+
+return_all_points_type([point(R,C)|T1],[wall(point(R,C))|T2]):- wall(point(R,C)),return_all_points_type(T1,T2),!.
+return_all_points_type([point(R,C)|T1],[wall_num(point(R,C),_)|T2]):- wall_num(point(R,C),_),return_all_points_type(T1,T2),!.
+return_all_points_type([point(R,C)|T1],[light(point(R,C))|T2]):- light(point(R,C)),return_all_points_type(T1,T2),!.
+
+return_all_points_type([point(R,C)],[wall(R,C)|T]):- wall(point(R,C)),.
+
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 
 all_cells_lit:- return_all_points(Result),all_cells_lit(Result),!.
@@ -227,3 +235,63 @@ all_cells_lit([H]):- lit(H).
 solved:- all_cells_lit,no_double_light,light_count_correct.
 
 %--------------------------------------------------SOLUTION SECTION------------------------------------------------------------------------------
+
+
+%nigoghosian's code=====================================================================================================
+%defining our dynamic variables
+:-dynamic light/1.
+:-dynamic nolight/1.
+
+% clear all dynamic facts because facts are stored in the current
+% session so clear_all_lights or clear_all_no_lights must be called to
+% clear previous stored dynamic facts
+clear_all_lights:- retractall(light(_)).
+clear_all_nolights:-retractall(nolight(_)).
+clear:-clear_all_lights,clear_all_nolights.
+
+%functions to light up the cell containing number four from all sides
+light_up_number_four_top(point(R,C)):-up_empty(point(R,C)),!,R1 is R-1,assertz(light(point(R1,C))),!.
+light_up_number_four_bottom(point(R,C)):-down_empty(point(R,C)),!,R2 is R+1,assertz(light(point(R2,C))),!.
+light_up_number_four_left(point(R,C)):-left_empty(point(R,C)),!,C1 is C-1,assertz(light(point(R,C1))),!.
+light_up_number_four_right(point(R,C)):-right_empty(point(R,C)),!,C2 is C+1,assertz(light(point(R,C2))),!.
+
+light_up_number_four(point(R,C)):-light_up_number_four_top(point(R,C)),light_up_number_four_bottom(point(R,C)),light_up_number_four_right(point(R,C)),light_up_number_four_left(point(R,C)).
+
+%function to return wall numbers with number 4
+return_list_wall_num_with_fours(Result):- findall(point(R,C),wall_num(point(R,C),4),Result).
+
+%find all fours in the grid and light them up
+light_up_all_fours:-return_list_wall_num_with_fours(L),light_up_all_fours1(L),!.
+light_up_all_fours1([H|T]):-light_up_number_four(H),light_up_all_fours1(T).
+light_up_all_fours1([]):-!.
+
+% functions to disable light from cell containing number zero from four
+% sides
+disable_light_number_zero_top(point(R,C)):-R1 is R-1,not(inside_bounds(point(R1,C))),!;R1 is R-1,assertz(nolight(point(R1,C))),!.
+disable_light_number_zero_bottom(point(R,C)):-R2 is R+1,not(inside_bounds(point(R2,C))),!;R2 is R+1,assertz(nolight(point(R2,C))),!.
+disable_light_number_zero_left(point(R,C)):-C1 is C-1,not(inside_bounds(point(R,C1))),!;C1 is C-1,assertz(nolight(point(R,C1))),!.
+disable_light_number_zero_right(point(R,C)):-C2 is C+1,not(inside_bounds(point(R,C2))),!;C2 is C+1,assertz(nolight(point(R,C2))),!.
+
+disable_light_number_zero(point(R,C)):-disable_light_number_zero_top(point(R,C)),disable_light_number_zero_bottom(point(R,C)),disable_light_number_zero_left(point(R,C)),disable_light_number_zero_right(point(R,C)).
+
+%johny's code=====================================================================================================
+%axomatics
+%count list elements
+count_e([],0).
+count_e([H|T],N):-count_e(T,N1),N is N1+1.
+%count neighbors list elements
+neighbors_count(X,Y,Z):-neighbors(point(X,Y),Elements),flatten(Elements,F_Elements),count_e(F_Elements,Z).
+%return the number in the wall
+return_wall_num(X,Y,Z):-wall_num(point(X,Y),Z).
+%check if number of the wall is 4
+check_wall_num_4(X,Y):-return_wall_num(X,Y,Z),Z = 4.
+%check if number of the wall is 0
+check_wall_num_0(X,Y):-return_wall_num(X,Y,Z),Z = 0.
+%check if number of the wall is 2
+check_wall_num_2(X,Y):-return_wall_num(X,Y,Z),Z = 2.
+%check if number of the wall is 3
+check_wall_num_3(X,Y):-return_wall_num(X,Y,Z),Z = 3.
+%check if the cell in the corner
+check_corner(X,Y):-neighbors_count(X,Y,Z),Z = 2.
+%check if the cell in the edge
+check_edge(X,Y):-neighbors_count(X,Y,Z),Z = 3.

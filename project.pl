@@ -313,6 +313,7 @@ light_up_obvious_neighbors([point(R,C)|T]):-(not(lit(point(R,C))),assertz(light(
 light_up_obvious_neighbors([[]|T]):-light_up_obvious_neighbors(T),!.
 light_up_obvious_neighbors([]):-!.
 
+%to light up all obvious wallnums in the row
 light_up_all_obvious:- return_list_wall_num(List), light_up_all_obvious(List).
 
 light_up_all_obvious([point(R,C)|T]):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),light_up_all_obvious(T),!.
@@ -320,3 +321,8 @@ light_up_all_obvious([point(R,C)|T]):- print_board,write('\n'),not(light_up_obvi
 light_up_all_obvious([point(R,C)]):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),!.
 light_up_all_obvious([point(R,C)]):- not(light_up_obvious_neighbors(point(R,C))),!.
 light_up_all_obvious([]):-print_board,!.
+
+%helper function to clear, consult, and print quickly
+cc():- consult('project.pl'),clear().
+c():- consult('project.pl').
+p():-print_board.

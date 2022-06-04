@@ -43,6 +43,7 @@ light(point(8,6)).
 
 %rules
 
+%-------------------------------------------TESTING SECTION----------------------------------------------------------------------------------
 %to check if a point is inside the boudaries of the board
 inside_bounds(point(R,C)):- size(Rmax,Cmax),R > 0,C > 0,R=<Rmax,C=<Cmax.
 
@@ -116,7 +117,7 @@ return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
 
 
-% george's code---------------------------------------------------------------------------------------------------------------------
+% ---------------------------------------------------------------------------------------------------------------------
 % we check if the cell's neighbor is not a wall or an edge and then we add it to the list.
 right_neighbor(point(R,C),point(R,B)):- right_empty(point(R,C)), B is C+1,!.
 right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))).
@@ -176,7 +177,7 @@ light_count_correct([]):-!.
 
 
 
-%rita's code--------------------------------------------------------------------------------------------------------------------------------
+%--------------------------------------------------------------------------------------------------------------------------------
 %counts lights in a list
 light_cells_count([],0).
 light_cells_count([H|T], LightCells):- light(H),light_cells_count(T, LightCells1), LightCells is LightCells1 + 1.
@@ -203,7 +204,7 @@ LightCells=<1,no_double_light_col(T),!.
 no_double_light_col([H|T]):-wall(H),no_double_light_col(T),!.
 no_double_light_col([]):-!.
 no_double_light:-no_double_light_col,no_double_light_row.
-%nicolas's code--------------------------------------------------------------------------------------------------------------------------------
+%--------------------------------------------------------------------------------------------------------------------------------
 return_full_row(R,[point(R,1)|T]):- return_full_row(R,2,T) .
 return_full_row(R,C,[point(R,C)|T]):- C1 is C+1 ,inside_bounds(point(R,C1)), return_full_row(R,C1,T),!.
 return_full_row(R,C,[point(R,C)]):- !.
@@ -222,5 +223,7 @@ cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 all_cells_lit:- return_all_points(Result),all_cells_lit(Result),!.
 all_cells_lit([H|T]):- lit(H),all_cells_lit(T).
 all_cells_lit([H]):- lit(H).
-
+%-----------------------------------------------------------
 solved:- all_cells_lit,no_double_light,light_count_correct.
+
+%--------------------------------------------------SOLUTION SECTION------------------------------------------------------------------------------

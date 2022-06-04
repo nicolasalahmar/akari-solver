@@ -105,18 +105,22 @@ return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
 
 % ---------------------------------------------------------------------------------------------------------------------
-% we check if the cell's neighbor is not a wall or an edge and then we add it to the list.
-right_neighbor(point(R,C),point(R,B)):- right_empty(point(R,C)), B is C+1,!.
-right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))).
+% we check if the cell's neighbor is not a wall or an edge or lit and then we add it to the list(returns only empty cells that are not lit).
+right_neighbor(point(R,C),point(R,B)):- B is C+1,not(lit(point(R,B))),right_empty(point(R,C)),!.
+right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))),!.
+right_neighbor(point(R,C),[]):- lit(point(R,C)).
 
-left_neighbor(point(R,C),point(R,B)):- left_empty(point(R,C)), B is C-1,!.
-left_neighbor(point(R,C),[]):- not(left_empty(point(R,C))).
+left_neighbor(point(R,C),point(R,B)):- B is C-1,not(lit(point(R,B))),left_empty(point(R,C)),!.
+left_neighbor(point(R,C),[]):- not(left_empty(point(R,C))),!.
+left_neighbor(point(R,C),[]):- lit(point(R,C)).
 
-up_neighbor(point(R,C),point(A,C)):- up_empty(point(R,C)), A is R-1,!.
-up_neighbor(point(R,C),[]):- not(up_empty(point(R,C))).
+up_neighbor(point(R,C),point(A,C)):- A is R-1,not(lit(point(A,C))),up_empty(point(R,C)),!.
+up_neighbor(point(R,C),[]):- not(up_empty(point(R,C))),!.
+up_neighbor(point(R,C),[]):- lit(point(R,C)).
 
-down_neighbor(point(R,C),point(A,C)):- down_empty(point(R,C)), A is R+1,!.
-down_neighbor(point(R,C),[]):- not(down_empty(point(R,C))).
+down_neighbor(point(R,C),point(A,C)):- A is R+1, not(lit(point(A,C))),down_empty(point(R,C)),!.
+down_neighbor(point(R,C),[]):- not(down_empty(point(R,C))),!.
+down_neighbor(point(R,C),[]):- lit(point(R,C)).
 
 %to return a list of a cell's neighbors
 neighbors(point(R,C),[RIGHT,LEFT,UP,DOWN]):- right_neighbor(point(R,C),RIGHT),
@@ -261,17 +265,6 @@ disable_light_number_zero_right(point(R,C)):-C2 is C+1,not(inside_bounds(point(R
 
 disable_light_number_zero(point(R,C)):-disable_light_number_zero_top(point(R,C)),disable_light_number_zero_bottom(point(R,C)),disable_light_number_zero_left(point(R,C)),disable_light_number_zero_right(point(R,C)).
 
-
-% george's code -----------------------------------------------------------------------------------------------------------
-light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),Num),
-                                        wall_num(point(R,C),Num), 
-                                        neighbors(point(R,C),List),
-                                        count(List,Num),
-                                        light_up_obvious_neighbors(List).
-light_up_obvious_neighbors([point(R,C)|T]):-(not(lit(point(R,C))),assertz(light(point(R,C))),light_up_obvious_neighbors(T)).
-light_up_obvious_neighbors([[]|T]):-light_up_obvious_neighbors(T).
-light_up_obvious_neighbors([]):-!.
-
 %nicolas' code------------------------------------------------------------------------------------------------------------
 return_full_row_type(R,AllPointsType,_):- return_full_row(R,AllPoints),return_full_row_type(AllPoints,AllPointsType).
 
@@ -304,3 +297,14 @@ print_row([point(_,_)]):- write('_'),!.
 print_board:- size(_,Cmax),print_board(1,Cmax).
 print_board(R,Cmax):- R>Cmax,!.
 print_board(R,Cmax):- print_row(R,_,_),write('\n'),R1 is R+1, print_board(R1,Cmax).
+
+% george's code -----------------------------------------------------------------------------------------------------------
+light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),Num),
+                                        wall_num(point(R,C),Num), 
+                                        neighbors(point(R,C),List),
+                                        count(List,Num),
+                                        light_up_obvious_neighbors(List).
+light_up_obvious_neighbors([point(R,C)|T]):-(not(lit(point(R,C))),assertz(light(point(R,C))),light_up_obvious_neighbors(T)).
+light_up_obvious_neighbors([[]|T]):-light_up_obvious_neighbors(T).
+light_up_obvious_neighbors([]):-!.
+

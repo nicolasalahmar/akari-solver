@@ -326,3 +326,6 @@ light_up_all_obvious([]):-print_board,!.
 cc():- consult('project.pl'),clear().
 c():- consult('project.pl').
 p():-print_board.
+
+%function to keep solving all obvious wall nums repeatedly until no more obvious wall nums are found.
+solve_all_obvious():-write('///////////////new pass//////////////////// \n'),light_up_all_obvious().

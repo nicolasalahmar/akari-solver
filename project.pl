@@ -2,40 +2,45 @@
 size(10,10).
 
 %walls
+wall(point(1,1)).
 wall(point(1,3)).
-wall(point(2,4)).
-wall(point(2,6)).
-wall(point(3,4)).
+wall(point(1,4)).
+wall(point(1,6)).
+wall(point(1,7)).
+wall(point(1,10)).
+wall(point(3,6)).
+wall(point(3,7)).
 wall(point(3,10)).
-wall(point(4,4)).
-wall(point(4,7)).
-wall(point(4,8)).
-wall(point(4,9)).
-wall(point(5,2)).
-wall(point(6,9)).
-wall(point(7,2)).
-wall(point(7,3)).
-wall(point(7,4)).
-wall(point(7,7)).
+wall(point(4,1)).
+wall(point(4,3)).
+wall(point(4,10)).
+wall(point(5,1)).
+wall(point(5,3)).
+wall(point(6,8)).
+wall(point(6,10)).
+wall(point(7,1)).
+wall(point(7,8)).
+wall(point(7,10)).
 wall(point(8,1)).
-wall(point(8,7)).
-wall(point(9,5)).
-wall(point(9,7)).
+wall(point(8,4)).
+wall(point(8,5)).
+wall(point(10,1)).
+wall(point(10,4)).
+wall(point(10,5)).
+wall(point(10,7)).
 wall(point(10,8)).
-
+wall(point(10,10)).
 
 %wall_num
-wall_num(point(1,3),2).
-wall_num(point(2,6),2).
-wall_num(point(3,10),3).
-wall_num(point(4,4),1).
-wall_num(point(5,2),2).
-wall_num(point(7,4),1).
-wall_num(point(7,7),1).
-wall_num(point(8,1),1).
-wall_num(point(8,7),1).
-wall_num(point(9,5),1).
-wall_num(point(10,8),1).
+wall_num(point(1,3),1).
+wall_num(point(3,7),2).
+wall_num(point(4,1),1).
+wall_num(point(4,10),1).
+wall_num(point(5,1),2).
+wall_num(point(7,10),0).
+wall_num(point(8,4),2).
+wall_num(point(10,5),2).
+wall_num(point(10,10),1).
 
 
 
@@ -115,23 +120,32 @@ return_list_wall_num(Result):- findall(point(R,C),wall_num(point(R,C),_),Result)
 %returns a list of all the lights in a board
 return_list_light(Result):- findall(point(R,C),light(point(R,C)),Result).
 
-
+%helper function to return corners of the board.
+return_list_corners(Result):- size(Rmax,Cmax), 
+                                    append([point(1,1)],[],L1),
+                                    append([point(Rmax,1)],[],L2),
+                                    append([point(1,Cmax)],[],L3),
+                                    append([point(Rmax,Cmax)],[],L4),
+                                    append(L1,L2,R1),
+                                    append(L3,L4,R2),
+                                    append(R1,R2,Result).
 
 % ---------------------------------------------------------------------------------------------------------------------
 % we check if the cell's neighbor is not a wall or an edge or lit and then we add it to the list(returns only empty cells that are not lit).
-right_neighbor(point(R,C),point(R,B)):- B is C+1,not(lit(point(R,B))),right_empty(point(R,C)),!.
+%note: if the neighbor is a light we add it to the list, this solves situations like a three that has 3 neighbors and one of them is a light(we light up the 2 neighbors left).
+right_neighbor(point(R,C),point(R,B)):- B is C+1,(not(lit(point(R,B)))),right_empty(point(R,C)),!.
 right_neighbor(point(R,C),[]):- not(right_empty(point(R,C))),!.
 right_neighbor(point(R,C),[]):- B is C+1,lit(point(R,B)).
 
-left_neighbor(point(R,C),point(R,B)):- B is C-1,not(lit(point(R,B))),left_empty(point(R,C)),!.
+left_neighbor(point(R,C),point(R,B)):- B is C-1,(not(lit(point(R,B)))),left_empty(point(R,C)),!.
 left_neighbor(point(R,C),[]):- not(left_empty(point(R,C))),!.
 left_neighbor(point(R,C),[]):- B is C-1, lit(point(R,B)).
 
-up_neighbor(point(R,C),point(A,C)):- A is R-1,not(lit(point(A,C))),up_empty(point(R,C)),!.
+up_neighbor(point(R,C),point(A,C)):- A is R-1,(not(lit(point(A,C)))),up_empty(point(R,C)),!.
 up_neighbor(point(R,C),[]):- not(up_empty(point(R,C))),!.
 up_neighbor(point(R,C),[]):- A is R-1, lit(point(A,C)).
 
-down_neighbor(point(R,C),point(A,C)):- A is R+1, not(lit(point(A,C))),down_empty(point(R,C)),!.
+down_neighbor(point(R,C),point(A,C)):- A is R+1, (not(lit(point(A,C)))),down_empty(point(R,C)),!.
 down_neighbor(point(R,C),[]):- not(down_empty(point(R,C))),!.
 down_neighbor(point(R,C),[]):- A is R+1, lit(point(A,C)).
 
@@ -234,16 +248,48 @@ return_all_points_type([point(R,C)|T1],[light(point(R,C))|T2]):- light(point(R,C
 cell(point(R,C)):- return_all_points(Result),member(point(R,C),Result).
 
 %to check if all cells in the board are lit.
-all_cells_lit:- return_all_points(Result),all_cells_lit(Result),!.
-all_cells_lit([H|T]):- lit(H),all_cells_lit(T).
-all_cells_lit([H]):- lit(H).
+all_cells_lit:- return_all_points(Result),all_cells_lit(Result).
+all_cells_lit([H|T]):- lit(H),all_cells_lit(T),!.
+all_cells_lit([H|T]):- (wall(H);wall_num(H,_)),all_cells_lit(T),!.
+all_cells_lit([]):-!.
 %-----------------------------------------------------------
 solved:- all_cells_lit,no_double_light,light_count_correct.
 
 %--------------------------------------------------SOLUTION SECTION------------------------------------------------------------------------------
 
 
-%nigoghosian's code--------------------------------------------------------------------------------------------------------------------------=
+
+
+
+
+
+
+
+
+
+
+
+%-----------------------------------------------------------------------------------------------------------------------------------------------
+%count list elements
+count_e([],0).
+count_e([_|T],N):-count_e(T,N1),N is N1+1.
+%count neighbors list elements
+neighbors_count(X,Y,Z):-neighbors(point(X,Y),Elements),flatten(Elements,F_Elements),count_e(F_Elements,Z).
+%return the number in the wall
+return_wall_num(X,Y,Z):-wall_num(point(X,Y),Z).
+%check if number of the wall is 4
+check_wall_num_4(X,Y):-return_wall_num(X,Y,Z),Z = 4.
+%check if number of the wall is 0
+check_wall_num_0(X,Y):-return_wall_num(X,Y,Z),Z = 0.
+%check if number of the wall is 2
+check_wall_num_2(X,Y):-return_wall_num(X,Y,Z),Z = 2.
+%check if number of the wall is 3
+check_wall_num_3(X,Y):-return_wall_num(X,Y,Z),Z = 3.
+%check if the cell in the corner
+check_corner(X,Y):-neighbors_count(X,Y,Z),Z = 2.
+%check if the cell in the edge
+check_edge(X,Y):-neighbors_count(X,Y,Z),Z = 3.
+
 %defining our dynamic variables
 :-dynamic light/1.
 :-dynamic nolight/1.
@@ -273,14 +319,85 @@ light_up_all_fours1([]):-!.
 
 % functions to disable light from cell containing number zero from four
 % sides
-disable_light_number_zero_top(point(R,C)):-R1 is R-1,not(inside_bounds(point(R1,C))),!;R1 is R-1,assertz(nolight(point(R1,C))),!.
-disable_light_number_zero_bottom(point(R,C)):-R2 is R+1,not(inside_bounds(point(R2,C))),!;R2 is R+1,assertz(nolight(point(R2,C))),!.
-disable_light_number_zero_left(point(R,C)):-C1 is C-1,not(inside_bounds(point(R,C1))),!;C1 is C-1,assertz(nolight(point(R,C1))),!.
-disable_light_number_zero_right(point(R,C)):-C2 is C+1,not(inside_bounds(point(R,C2))),!;C2 is C+1,assertz(nolight(point(R,C2))),!.
+no_light_zero_top(point(R,C)):-R1 is R-1,not(inside_bounds(point(R1,C))),!;R1 is R-1,assertz(nolight(point(R1,C))),!.
+no_light_zero_bottom(point(R,C)):-R2 is R+1,not(inside_bounds(point(R2,C))),!;R2 is R+1,assertz(nolight(point(R2,C))),!.
+no_light_zero_left(point(R,C)):-C1 is C-1,not(inside_bounds(point(R,C1))),!;C1 is C-1,assertz(nolight(point(R,C1))),!.
+no_light_zero_right(point(R,C)):-C2 is C+1,not(inside_bounds(point(R,C2))),!;C2 is C+1,assertz(nolight(point(R,C2))),!.
 
-disable_light_number_zero(point(R,C)):-disable_light_number_zero_top(point(R,C)),disable_light_number_zero_bottom(point(R,C)),disable_light_number_zero_left(point(R,C)),disable_light_number_zero_right(point(R,C)).
+no_light_zero(point(R,C)):-no_light_zero_top(point(R,C)),no_light_zero_bottom(point(R,C)),no_light_zero_left(point(R,C)),no_light_zero_right(point(R,C)).
 
-%nicolas' code------------------------------------------------------------------------------------------------------------
+%function to return wall number with 2
+return_list_wall_num_with_twos(Result):- findall(point(R,C),wall_num(point(R,C),2),Result).
+
+% function that adds to a cell containing number two , two light
+% bulbs to it's up and down , and the next two functions are based on
+% the same idea
+
+add_to_two_up_down(point(R,C)):-R1 is R+1,R2 is R-1,assertz(light(point(R1,C))),assertz(light(point(R2,C))).
+add_to_two_right_left(point(R,C)):-C1 is C+1,C2 is C-1,assertz(light(point(R,C1))),assertz(light(point(R,C2))).
+
+% function that adds two light bulbs to a cell that has a wall to it's
+% right and left and the next two are based on the sames idea
+
+check_wall_right_left_and_add_for_two(point(R,C)):- right_empty(point(R,C)),!;left_empty(point(R,C)),!;add_to_two_up_down(point(R,C)).
+check_wall_up_down_and_add_for_two(point(R,C)):-up_empty(point(R,C)),!;down_empty(point(R,C)),!;add_to_two_right_left(point(R,C)).
+
+check_bounds_right_and_add_for_two(point(R,C)):- C1 is C+1,inside_bounds(point(R,C1)),!;left_empty(point(R,C)),!;add_to_two_up_down(point(R,C)).
+check_bounds_left_and_add_for_two(point(R,C)):- C1 is C-1,inside_bounds(point(R,C1)),!;right_empty(point(R,C)),!;add_to_two_up_down(point(R,C)).
+check_bounds_up_and_add_for_two(point(R,C)):- R1 is R-1,inside_bounds(point(R1,C)),!;down_empty(point(R,C)),!;add_to_two_right_left(point(R,C)).
+check_bounds_down_and_add_for_two(point(R,C)):- R1 is R+1,inside_bounds(point(R1,C)),!;up_empty(point(R,C)),!;add_to_two_right_left(point(R,C)).
+
+
+light_up_number_two(point(R,C)):-check_wall_right_left_and_add_for_two(point(R,C)),check_wall_up_down_and_add_for_two(point(R,C)),check_bounds_right_and_add_for_two(point(R,C)),check_bounds_left_and_add_for_two(point(R,C)),check_bounds_up_and_add_for_two(point(R,C)),check_bounds_down_and_add_for_two(point(R,C)).
+
+light_up_all_twos:-return_list_wall_num_with_twos(L),light_up_all_twos1(L),!.
+light_up_all_twos1([H|T]):-light_up_number_two(H),light_up_all_twos1(T).
+light_up_all_twos1([]):-!.
+
+
+%function to return wall number with 3
+return_list_wall_num_with_threes(Result):- findall(point(R,C),wall_num(point(R,C),3),Result).
+
+% function that adds to a cell containing number three , three light
+% bulbs to it's up and down and left , and the next three are based on
+% the same idea
+add_to_three_up_down_left(point(R,C)):-R1 is R+1,R2 is R-1,C2 is C-1,assertz(light(point(R1,C))),assertz(light(point(R2,C))),assertz(light(point(R,C2))).
+add_to_three_up_down_right(point(R,C)):-R1 is R+1,R2 is R-1,C1 is C+1,assertz(light(point(R1,C))),assertz(light(point(R2,C))),assertz(light(point(R,C1))).
+add_to_three_up_left_right(point(R,C)):-R2 is R-1,C1 is C+1,C2 is C-1,assertz(light(point(R2,C))),assertz(light(point(R,C1))),assertz(light(point(R,C2))).
+add_to_three_down_left_right(point(R,C)):-R1 is R+1,C1 is C+1,C2 is C-1,assertz(light(point(R1,C))),assertz(light(point(R,C1))),assertz(light(point(R,C2))).
+
+% function that adds three light bulbs to a cell that is on the
+% edge of the grid but it must'nt have a cell to it's right (because
+% it's outside the boundaries of our grid ) , and the next three
+% functions are based on the same idea
+check_bounds_right_and_add_for_three(point(R,C)):- C1 is C+1,inside_bounds(point(R,C1)),!;add_to_three_up_down_left(point(R,C)).
+check_bounds_left_and_add_for_three(point(R,C)):- C1 is C-1,inside_bounds(point(R,C1)),!;add_to_three_up_down_right(point(R,C)).
+check_bounds_up_and_add_for_three(point(R,C)):- R1 is R-1,inside_bounds(point(R1,C)),!;add_to_three_down_left_right(point(R,C)).
+check_bounds_down_and_add_for_three(point(R,C)):- R1 is R+1,inside_bounds(point(R1,C)),!;add_to_three_up_left_right(point(R,C)).
+
+% function that adds three light bulbs to a cell that has a wall to it's
+% right and the next three are based on the sames idea
+check_wall_right_and_add_for_three(point(R,C)):- right_empty(point(R,C)),!;add_to_three_up_down_left(point(R,C)).
+check_wall_left_and_add_for_three(point(R,C)):-left_empty(point(R,C)),!;add_to_three_up_down_right(point(R,C)).
+check_wall_up_and_add_for_three(point(R,C)):- up_empty(point(R,C)),!;add_to_three_down_left_right(point(R,C)).
+check_wall_down_and_add_for_three(point(R,C)):- down_empty(point(R,C)),!;add_to_three_up_left_right(point(R,C)).
+
+light_up_number_three(point(R,C)):-check_bounds_right_and_add_for_three(point(R,C)),check_bounds_left_and_add_for_three(point(R,C)),check_bounds_up_and_add_for_three(point(R,C)),check_bounds_down_and_add_for_three(point(R,C)),check_wall_right_and_add_for_three(point(R,C)),check_wall_left_and_add_for_three(point(R,C)),check_wall_up_and_add_for_three(point(R,C)),check_wall_down_and_add_for_three(point(R,C)).
+
+light_up_all_threes:-return_list_wall_num_with_threes(L),light_up_all_threes1(L),!.
+light_up_all_threes1([H|T]):-light_up_number_three(H),light_up_all_threes1(T).
+light_up_all_threes1([]):-!.
+%-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 %print board functions.
 return_full_row_type(R,AllPointsType,_):- return_full_row(R,AllPoints),return_full_row_type(AllPoints,AllPointsType).
 
@@ -314,14 +431,33 @@ print_board:- size(_,Cmax),print_board(1,Cmax).
 print_board(R,Cmax):- R>Cmax,!.
 print_board(R,Cmax):- print_row(R,_,_),write('\n'),R1 is R+1, print_board(R1,Cmax).
 
-% george's code -----------------------------------------------------------------------------------------------------------
-%to put lights in obvious spots such as wallnum(4) and wallnum(3) that has only 3 neighbors for example
+%-----------------------------------------------------------------------------------------------------------
+%to put lights in obvious spots such as wallnum(4) and wallnum(3) that has only 3 neighbors for example.
+%note: this also solves situations like a three that has 3 neighbors and one of them is a light(we light up the 2 neighbors left).
+light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),Num),
+                                        wall_num(point(R,C),Num), 
+                                        light_neighbors(point(R,C),Lights),
+                                        count(Lights,NumLights),
+                                        Num is NumLights,
+                                        !, fail.
+
 light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),Num),
                                         wall_num(point(R,C),Num), 
                                         neighbors(point(R,C),List),
                                         count(List,Num),
                                         light_up_obvious_neighbors(List),!.
-light_up_obvious_neighbors([point(R,C)|T]):-(not(lit(point(R,C))),assertz(light(point(R,C))),light_up_obvious_neighbors(T)),!.
+
+light_up_obvious_neighbors(point(R,C)):-return_num(point(R,C),WallNum),
+                                        wall_num(point(R,C),WallNum),
+                                        light_neighbors(point(R,C),Lights),
+                                        count(Lights,NumLights),
+                                        neighbors(point(R,C),List),
+                                        count(List,NumNeighbors),
+                                        WallNum is NumNeighbors+NumLights,
+                                        light_up_obvious_neighbors(List),!.
+
+light_up_obvious_neighbors([point(R,C)|T]):-not(lit(point(R,C))),assertz(light(point(R,C))),light_up_obvious_neighbors(T),!.
+light_up_obvious_neighbors([point(R,C)|T]):-lit(point(R,C)),light(point(R,C)),assertz(light(point(R,C))),light_up_obvious_neighbors(T),!.
 light_up_obvious_neighbors([[]|T]):-light_up_obvious_neighbors(T),!.
 light_up_obvious_neighbors([]):-!.
 
@@ -340,11 +476,39 @@ cc():- consult('project.pl'),clear().
 c():- consult('project.pl').
 p():-print_board.
 s():-set_prolog_flag(answer_write_options,[max_depth(0)]).
+
 %function to keep solving all obvious wall nums repeatedly until no more obvious wall nums are found.
 % we store all results (true or false) in a list and keep looping through this function until there is no true in the list
 % which means that the function cannot light up any abvious wallnums because there aren't any left.
-solve_all_obvious():-write('///////////////new pass//////////////////// \n'),
-                     light_up_all_obvious(List),count(List,Num), Num>0.
-       
-solve_all_obvious(0).
-solve_all_obvious(Num):-light_up_all_obvious(List),count(List,Num), Num>0,solve_all_obvious(_).
+solve_all_obvious():-write('\n///////////////Checking for Obvious Wallnums to Solve (First Pass)//////////////////// \n\n'),
+                     light_up_all_obvious(List),count(List,Num),Num>0,solve_all_obvious(Num).
+
+
+solve_all_obvious(0):- write('\n///////////////All Obvious Wallnums Are Solved !//////////////////// \n\n'),!.
+
+solve_all_obvious(_):-write('\n///////////////New Pass to Check for Obvious Wallnums//////////////////// \n\n'),
+                        light_up_all_obvious(List),count(List,Num),solve_all_obvious(Num).
+
+
+
+%function that lights up all empty cells that has no neighbors (not empty,lit cells around them)(isolated empty cells).
+solve_isolated_cells():-write('\n///////////////Checking For Isolated Cells To Solve//////////////////// \n\n'),
+                       return_all_points(List), solve_isolated_cells(List).
+
+solve_isolated_cells([H|T]):- not(lit(H)),
+                              neighbors(H,List),count(List,0),
+                              assertz(light(H)),
+                              print_board(),write('\n'),
+                              solve_isolated_cells(T),!.
+
+solve_isolated_cells([_|T]):- solve_isolated_cells(T).
+
+solve_isolated_cells([]):- print_board(),write('\n'),
+                           write('\n///////////////All Isolated Cells Are Checked & Solved !//////////////////// \n\n'),!.
+
+%final function to solve the board.
+solve:-clear(),solve_all_obvious(),solve_isolated_cells(),
+       write('\n///////////////Puzzle Solved !//////////////////// \n\n').
+
+
+%-----------------------------------------------------------------END OF PROJECT-------------------------------------------------------------------------------

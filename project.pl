@@ -1,50 +1,36 @@
-
 size(10,10).
 
 %walls
-wall(point(1,1)).
-wall(point(1,3)).
-wall(point(1,4)).
-wall(point(1,6)).
-wall(point(1,7)).
-wall(point(1,10)).
-wall(point(3,6)).
-wall(point(3,7)).
-wall(point(3,10)).
-wall(point(4,1)).
-wall(point(4,3)).
-wall(point(4,10)).
-wall(point(5,1)).
-wall(point(5,3)).
-wall(point(6,8)).
-wall(point(6,10)).
-wall(point(7,1)).
-wall(point(7,8)).
-wall(point(7,10)).
-wall(point(8,1)).
-wall(point(8,4)).
-wall(point(8,5)).
-wall(point(10,1)).
-wall(point(10,4)).
-wall(point(10,5)).
-wall(point(10,7)).
-wall(point(10,8)).
-wall(point(10,10)).
+wall(point(1,9)).
+wall(point(2,1)).
+wall(point(2,3)).
+wall(point(2,4)).
+wall(point(3,4)).
+wall(point(3,9)).
+wall(point(4,5)).
+wall(point(4,8)).
+wall(point(4,9)).
+wall(point(5,7)).
+wall(point(6,4)).
+wall(point(7,2)).
+wall(point(7,3)).
+wall(point(7,6)).
+wall(point(8,2)).
+wall(point(8,7)).
+wall(point(9,7)).
+wall(point(9,8)).
+wall(point(9,10)).
+wall(point(10,2)).
+
 
 %wall_num
-wall_num(point(1,3),1).
-wall_num(point(3,7),2).
-wall_num(point(4,1),1).
-wall_num(point(4,10),1).
-wall_num(point(5,1),2).
-wall_num(point(7,10),0).
-wall_num(point(8,4),2).
-wall_num(point(10,5),2).
-wall_num(point(10,10),1).
-
-
-
-
+wall_num(point(2,3),3).
+wall_num(point(3,9),3).
+wall_num(point(4,5),2).
+wall_num(point(4,8),3).
+wall_num(point(7,6),3).
+wall_num(point(8,2),2).
+wall_num(point(9,10),2).
 %rules
 
 %-------------------------------------------TESTING SECTION----------------------------------------------------------------------------------
@@ -467,8 +453,8 @@ light_up_obvious_neighbors([]):-!.
 light_up_all_obvious(Status):- return_list_wall_num(List), light_up_all_obvious(List,Status).
 %light_up_all_obvious([point(R,C)],[1]):- print_board,write('\n'),light_up_obvious_neighbors(point(R,C)).
 %light_up_all_obvious([point(R,C)],[[]]):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))).
-light_up_all_obvious([point(R,C)|T],[1|T1]):-print_board,write('\n'),light_up_obvious_neighbors(point(R,C)),light_up_all_obvious(T,T1),!.
-light_up_all_obvious([point(R,C)|T],[[]|T1]):- print_board,write('\n'),not(light_up_obvious_neighbors(point(R,C))),light_up_all_obvious(T,T1),!.
+light_up_all_obvious([point(R,C)|T],[1|T1]):-light_up_obvious_neighbors(point(R,C)),light_up_all_obvious(T,T1),!.
+light_up_all_obvious([point(R,C)|T],[[]|T1]):- not(light_up_obvious_neighbors(point(R,C))),light_up_all_obvious(T,T1),!.
 light_up_all_obvious([],[]):-print_board,!.
 
 %helper function to clear, consult, and print quickly

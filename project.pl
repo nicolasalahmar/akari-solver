@@ -365,14 +365,12 @@ solved:- all_cells_lit,no_double_light,light_count_correct.
 %-----------------------------------------------------------------------------------------------------------------------------------------------
 %defining our dynamic variables
 :-dynamic light/1.
-:-dynamic nolight/1.
 
 % clear all dynamic facts because facts are stored in the current
-% session so clear_all_lights or clear_all_no_lights must be called to
+% session so clear_all_lights 
 % clear previous stored dynamic facts
 clear_all_lights:- retractall(light(_)).
-clear_all_nolights:-retractall(nolight(_)).
-clear:-clear_all_lights,clear_all_nolights.
+clear:-clear_all_lights.
 %-----------------------------------------------------------------------------------------------------------------------------------------------
 
 

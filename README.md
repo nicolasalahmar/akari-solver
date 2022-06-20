@@ -16,8 +16,8 @@
 <p>the first portion of the code is dedicated for the definition of the board</br>
 after that come predefined utility functions that help with the solving and testing of solved boards.</br>
 
-then the three main rules for the testing function.</br>
-finally the defined rules for the solving functionality.</p>
+then the three main rules for the testing function.`</br>`
+finally the defined rules for the solving functionality.`</p>`
 
 <p>a board is considered solved when three conditions are met</p><ul><li>all cells are hit by a light(all_cells_lit)</li><li>no two lights hit one cell(no_double_light)</li><li>the number of lights on the sides of the wallnum is equal to the wallnum number(light_count_correct)</li>
 
@@ -25,3 +25,14 @@ finally the defined rules for the solving functionality.</p>
 <li> isolated cells where all cells have been lit up and the remaining are singular cells across the board</li></ol>
 
 
+<footer> <h3>Contributors:</h3>
+  <ul>
+        <li>George Kassar</li>
+        <li>George Nigoghosian</li>
+        <li>Johny Kodsy</li>
+	<li>Rita Rezeq</li>
+        <li>Nicolas Al-Ahmar</li>
+
+    `</ul>`
+
+</footer>

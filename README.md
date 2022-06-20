@@ -24,7 +24,6 @@ finally the defined rules for the solving functionality.`</p>`
 <p>as of now the tool is able to solve:<ol><li> axiomatic situations where the number of neighbors of a wallnum are equal to the number of the wallnum</li>
 <li> isolated cells where all cells have been lit up and the remaining are singular cells across the board</li></ol>
 
-
 <footer> <h3>Contributors:</h3>
   <ul>
         <li>George Kassar</li>
@@ -32,7 +31,5 @@ finally the defined rules for the solving functionality.`</p>`
         <li>Johny Kodsy</li>
 	<li>Rita Rezeq</li>
         <li>Nicolas Al-Ahmar</li>
-
-    </ul>
-
+</ul>
 </footer>

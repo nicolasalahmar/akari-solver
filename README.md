@@ -33,6 +33,6 @@ finally the defined rules for the solving functionality.`</p>`
 	<li>Rita Rezeq</li>
         <li>Nicolas Al-Ahmar</li>
 
-    `</ul>`
+    </ul>
 
 </footer>

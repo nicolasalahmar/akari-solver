@@ -1,5 +1,5 @@
 <h1 align='center' >AKARI SOLVER </h1>
-<p> this project was intended as a homework for the basics of artificial intelligence course third year in the faculty of information technology engineering - university of damascus</p>
+<p> this project was intended as a homework for the basics of artificial intelligence course third year in the Faculty of Information Technology Engineering - Damascus University</p>
 
 <h4>Prerequisites</h4>
 <ul>
